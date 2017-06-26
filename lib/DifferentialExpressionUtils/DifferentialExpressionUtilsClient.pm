@@ -12,6 +12,7 @@ eval {
     $get_time = sub { Time::HiRes::gettimeofday() };
 };
 
+use Bio::KBase::AuthToken;
 
 # Client version should match Impl version
 # This is a Semantic Version number,
@@ -74,6 +75,27 @@ sub new
 	push(@{$self->{headers}}, 'Kbrpc-Errordest', $self->{kbrpc_error_dest});
     }
 
+    #
+    # This module requires authentication.
+    #
+    # We create an auth token, passing through the arguments that we were (hopefully) given.
+
+    {
+	my %arg_hash2 = @args;
+	if (exists $arg_hash2{"token"}) {
+	    $self->{token} = $arg_hash2{"token"};
+	} elsif (exists $arg_hash2{"user_id"}) {
+	    my $token = Bio::KBase::AuthToken->new(@args);
+	    if (!$token->error_message) {
+	        $self->{token} = $token->token;
+	    }
+	}
+	
+	if (exists $self->{token})
+	{
+	    $self->{client}->{token} = $self->{token};
+	}
+    }
 
     my $ua = $self->{client}->ua;	 
     my $timeout = $ENV{CDMI_TIMEOUT} || (30 * 60);	 
@@ -84,6 +106,286 @@ sub new
 }
 
 
+
+
+=head2 upload_differentialExpression
+
+  $return = $obj->upload_differentialExpression($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a DifferentialExpressionUtils.UploadDifferentialExpressionParams
+$return is a DifferentialExpressionUtils.UploadDifferentialExpressionOutput
+UploadDifferentialExpressionParams is a reference to a hash where the following keys are defined:
+	destination_ref has a value which is a string
+	source_dir has a value which is a string
+	expressionSet_ref has a value which is a string
+	tool_used has a value which is a string
+	tool_version has a value which is a string
+UploadDifferentialExpressionOutput is a reference to a hash where the following keys are defined:
+	obj_ref has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a DifferentialExpressionUtils.UploadDifferentialExpressionParams
+$return is a DifferentialExpressionUtils.UploadDifferentialExpressionOutput
+UploadDifferentialExpressionParams is a reference to a hash where the following keys are defined:
+	destination_ref has a value which is a string
+	source_dir has a value which is a string
+	expressionSet_ref has a value which is a string
+	tool_used has a value which is a string
+	tool_version has a value which is a string
+UploadDifferentialExpressionOutput is a reference to a hash where the following keys are defined:
+	obj_ref has a value which is a string
+
+
+=end text
+
+=item Description
+
+Uploads the differential expression  *
+
+=back
+
+=cut
+
+ sub upload_differentialExpression
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function upload_differentialExpression (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to upload_differentialExpression:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'upload_differentialExpression');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "DifferentialExpressionUtils.upload_differentialExpression",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'upload_differentialExpression',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method upload_differentialExpression",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'upload_differentialExpression',
+				       );
+    }
+}
+ 
+
+
+=head2 download_differentialExpression
+
+  $return = $obj->download_differentialExpression($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a DifferentialExpressionUtils.DownloadDifferentialExpressionParams
+$return is a DifferentialExpressionUtils.DownloadDifferentialExpressionOutput
+DownloadDifferentialExpressionParams is a reference to a hash where the following keys are defined:
+	source_ref has a value which is a string
+DownloadDifferentialExpressionOutput is a reference to a hash where the following keys are defined:
+	ws_id has a value which is a string
+	destination_dir has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a DifferentialExpressionUtils.DownloadDifferentialExpressionParams
+$return is a DifferentialExpressionUtils.DownloadDifferentialExpressionOutput
+DownloadDifferentialExpressionParams is a reference to a hash where the following keys are defined:
+	source_ref has a value which is a string
+DownloadDifferentialExpressionOutput is a reference to a hash where the following keys are defined:
+	ws_id has a value which is a string
+	destination_dir has a value which is a string
+
+
+=end text
+
+=item Description
+
+Downloads expression *
+
+=back
+
+=cut
+
+ sub download_differentialExpression
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function download_differentialExpression (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to download_differentialExpression:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'download_differentialExpression');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "DifferentialExpressionUtils.download_differentialExpression",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'download_differentialExpression',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method download_differentialExpression",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'download_differentialExpression',
+				       );
+    }
+}
+ 
+
+
+=head2 export_differentialExpression
+
+  $output = $obj->export_differentialExpression($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a DifferentialExpressionUtils.ExportParams
+$output is a DifferentialExpressionUtils.ExportOutput
+ExportParams is a reference to a hash where the following keys are defined:
+	source_ref has a value which is a string
+ExportOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a DifferentialExpressionUtils.ExportParams
+$output is a DifferentialExpressionUtils.ExportOutput
+ExportParams is a reference to a hash where the following keys are defined:
+	source_ref has a value which is a string
+ExportOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+Wrapper function for use by in-narrative downloaders to download expressions from shock *
+
+=back
+
+=cut
+
+ sub export_differentialExpression
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function export_differentialExpression (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to export_differentialExpression:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'export_differentialExpression');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "DifferentialExpressionUtils.export_differentialExpression",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'export_differentialExpression',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method export_differentialExpression",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'export_differentialExpression',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -119,7 +421,7 @@ sub status
 sub version {
     my ($self) = @_;
     my $result = $self->{client}->call($self->{url}, $self->{headers}, {
-        method => "${last_module.module_name}.version",
+        method => "DifferentialExpressionUtils.version",
         params => [],
     });
     if ($result) {
@@ -127,16 +429,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => '${last_method.name}',
+                method_name => 'export_differentialExpression',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method ${last_method.name}",
+            error => "Error invoking method export_differentialExpression",
             status_line => $self->{client}->status_line,
-            method_name => '${last_method.name}',
+            method_name => 'export_differentialExpression',
         );
     }
 }
@@ -170,6 +472,276 @@ sub _validate_version {
 }
 
 =head1 TYPES
+
+
+
+=head2 boolean
+
+=over 4
+
+
+
+=item Description
+
+A boolean - 0 for false, 1 for true.
+@range (0, 1)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
+
+=end text
+
+=back
+
+
+
+=head2 UploadDifferentialExpressionParams
+
+=over 4
+
+
+
+=item Description
+
+*    Required input parameters for uploading Differential expression data
+
+        string   destination_ref        -   object reference of Differential expression data.
+                                            The object ref is 'ws_name_or_id/obj_name_or_id'
+                                            where ws_name_or_id is the workspace name or id
+                                            and obj_name_or_id is the object name or id
+        string   source_dir             -   directory with the files to be uploaded
+        string   expressionSet_ref      -   expressionSet object reference
+        string   tool_used              -   cufflinks, ballgown or deseq
+        string   tool_version           -   version of the tool used
+    *
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+destination_ref has a value which is a string
+source_dir has a value which is a string
+expressionSet_ref has a value which is a string
+tool_used has a value which is a string
+tool_version has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+destination_ref has a value which is a string
+source_dir has a value which is a string
+expressionSet_ref has a value which is a string
+tool_used has a value which is a string
+tool_version has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 UploadDifferentialExpressionOutput
+
+=over 4
+
+
+
+=item Description
+
+*     Output from upload differential expression    *
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+obj_ref has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+obj_ref has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 DownloadDifferentialExpressionParams
+
+=over 4
+
+
+
+=item Description
+
+*
+Required input parameters for downloading Differential expression
+string source_ref         -       object reference of expression source. The
+                            object ref is 'ws_name_or_id/obj_name_or_id'
+                            where ws_name_or_id is the workspace name or id
+                            and obj_name_or_id is the object name or id
+    *
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+source_ref has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+source_ref has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 DownloadDifferentialExpressionOutput
+
+=over 4
+
+
+
+=item Description
+
+*  The output of the download method.  *
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+ws_id has a value which is a string
+destination_dir has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+ws_id has a value which is a string
+destination_dir has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ExportParams
+
+=over 4
+
+
+
+=item Description
+
+*
+Required input parameters for exporting expression
+
+string   source_ref         -   object reference of Differential expression. The
+                            object ref is 'ws_name_or_id/obj_name_or_id'
+                            where ws_name_or_id is the workspace name or id
+                            and obj_name_or_id is the object name or id
+     *
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+source_ref has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+source_ref has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ExportOutput
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+shock_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+shock_id has a value which is a string
+
+
+=end text
+
+=back
 
 
 

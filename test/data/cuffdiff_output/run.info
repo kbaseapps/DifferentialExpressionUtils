@@ -1,0 +1,5 @@
+param	value
+cmd_line	/opt/cufflinks/cuffdiff -p 4 --library-norm-method geometric -o /kb/module/work/tmp/cuffdiff_merge_58fcae5f-3679-4676-a894-d37682c348fe/cuffdiff_682f90cb-bc55-4994-ae28-9701fa45c983 -L WT,WT,hy5,hy5 -u /kb/module/work/tmp/cuffdiff_merge_58fcae5f-3679-4676-a894-d37682c348fe/cuffmerge_701fa65a-87ed-441d-93a9-c6b8f80ac56e/merged.gtf /kb/module/work/tmp/cuffdiff_merge_58fcae5f-3679-4676-a894-d37682c348fe/expset_43ef26be-b659-4fe4-a6cd-292b9fe98338/WT_1_hisat2_alignment/accepted_hits.bam /kb/module/work/tmp/cuffdiff_merge_58fcae5f-3679-4676-a894-d37682c348fe/expset_43ef26be-b659-4fe4-a6cd-292b9fe98338/WT_2_hisat2_alignment/accepted_hits.bam /kb/module/work/tmp/cuffdiff_merge_58fcae5f-3679-4676-a894-d37682c348fe/expset_43ef26be-b659-4fe4-a6cd-292b9fe98338/hy5_1_hisat2_alignment/accepted_hits.bam /kb/module/work/tmp/cuffdiff_merge_58fcae5f-3679-4676-a894-d37682c348fe/expset_43ef26be-b659-4fe4-a6cd-292b9fe98338/hy5_2_hisat2_alignment/accepted_hits.bam 
+version	2.2.1
+SVN_revision	4237
+boost_version	104700
