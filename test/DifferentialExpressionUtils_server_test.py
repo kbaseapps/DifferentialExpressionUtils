@@ -98,7 +98,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         params = {
                   'destination_ref': self.getWsName() + '/test_output_diffexp',
                   'source_dir': self.upload_dir_path,
-                  'expressionSet_ref': '22254/32/1',
+                  'expressionSet_ref': '4389/18/2',
                   'tool_used': 'cuffdiff',
                   'tool_version': '2.2.1'
                   }
@@ -106,7 +106,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         retVal = self.getImpl().upload_differentialExpression(self.ctx, params)[0]
 
         inputObj = self.dfu.get_objects(
-            {'object_refs': ['22254/32/1']})['data'][0]
+            {'object_refs': ['4389/18/2']})['data'][0]
 
         print("============ INPUT EXPRESSION SET OBJECT ==============")
         pprint(inputObj)
@@ -122,6 +122,6 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         self.assertEqual(obj['info'][2].startswith('KBaseRNASeq.RNASeqDifferentialExpression'), True)
         d = obj['data']
         self.assertEqual(d['genome_id'], inputObj['data']['genome_id'])
-        self.assertEqual(d['expressionSet_id'], '22254/32/1')
+        self.assertEqual(d['expressionSet_id'], '4389/18/2')
         self.assertEqual(d['alignmentSet_id'], inputObj['data']['alignmentSet_id'])
         self.assertEqual(d['sampleset_id'], inputObj['data']['sampleset_id'])
