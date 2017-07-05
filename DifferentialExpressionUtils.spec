@@ -23,18 +23,24 @@ module DifferentialExpressionUtils {
                                             where ws_name_or_id is the workspace name or id
                                             and obj_name_or_id is the object name or id
         string   source_dir             -   directory with the files to be uploaded
-        string   expressionSet_ref      -   expressionSet object reference
+        string   expressionset_ref      -   expressionset object reference
         string   tool_used              -   cufflinks, ballgown or deseq
         string   tool_version           -   version of the tool used
+        string   diffexpr_filename      -   name of the differential expression data file
+                                            in source_dir, created by cuffdiff, deseq or ballgown
     **/
 
     typedef structure {
 
         string   destination_ref;
         string   source_dir;
-        string   expressionSet_ref;
+        string   expressionset_ref;
         string   tool_used;
         string   tool_version;
+        string   diffexpr_filename;
+
+        mapping<string opt_name, string opt_value> tool_opts;   /* Optional */
+        string   comments;                                      /* Optional */
 
     }  UploadDifferentialExpressionParams;
 
@@ -52,7 +58,7 @@ module DifferentialExpressionUtils {
                                    authentication required;
     /**
         Required input parameters for downloading Differential expression
-        string source_ref 	-       object reference of expression source. The
+        string  source_ref   -      object reference of expression source. The
                                     object ref is 'ws_name_or_id/obj_name_or_id'
                                     where ws_name_or_id is the workspace name or id
                                     and obj_name_or_id is the object name or id

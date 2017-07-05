@@ -98,9 +98,10 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         params = {
                   'destination_ref': self.getWsName() + '/test_output_diffexp',
                   'source_dir': self.upload_dir_path,
-                  'expressionSet_ref': '4389/18/2',
+                  'expressionset_ref': '4389/18/2',
                   'tool_used': 'cuffdiff',
-                  'tool_version': '2.2.1'
+                  'tool_version': '2.2.1',
+                  'diffexpr_filename': 'gene_exp.diff'
                   }
 
         retVal = self.getImpl().upload_differentialExpression(self.ctx, params)[0]
@@ -113,7 +114,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         print("==========================================================")
 
         obj = self.dfu.get_objects(
-            {'object_refs': [retVal.get('obj_ref')]})['data'][0]
+            {'object_refs': [retVal.get('diffexpr_obj_ref')]})['data'][0]
 
         print("============ DIFFERENTIAL EXPRESSION OUTPUT ==============")
         pprint(obj)

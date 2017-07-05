@@ -41,7 +41,8 @@ class DifferentialExpressionUtils:
     PARAM_IN_DST_REF = 'destination_ref'
     PARAM_IN_TOOL_USED = 'tool_used'
     PARAM_IN_TOOL_VER = 'tool_version'
-    PARAM_IN_EXPR_SET_REF = 'expressionSet_ref'
+    PARAM_IN_EXPR_SET_REF = 'expressionset_ref'
+    PARAM_IN_DIFFEXP_FILENAME = 'diffexpr_filename'
 
     def log(self, message, prefix_newline=False):
         print(('\n' if prefix_newline else '') +
@@ -92,6 +93,7 @@ class DifferentialExpressionUtils:
                                             self.PARAM_IN_EXPR_SET_REF,
                                             self.PARAM_IN_TOOL_USED,
                                             self.PARAM_IN_TOOL_VER,
+                                            self.PARAM_IN_DIFFEXP_FILENAME
                                             ])
 
         ws_name_id, obj_name_id = self._proc_ws_obj_params(ctx, params)
@@ -141,7 +143,9 @@ class DifferentialExpressionUtils:
                 expression_data = self.ws_client.get_objects2(
                         {'objects':
                          [{'ref': expression_id}]})['data'][0]['data']
-                condition.append(expression_data.get('condition'))
+                expression_condition = expression_data.get('condition')
+                if expression_condition not in condition:
+                    condition.append(expression_condition)
 
         diffexpr_data.update({'condition': condition})
         return diffexpr_data
@@ -211,7 +215,7 @@ class DifferentialExpressionUtils:
                                             })[0]
         self.log('save complete')
 
-        returnVal = {'obj_ref': str(res[6]) + '/' + str(res[0]) + '/' + str(res[4])}
+        returnVal = {'diffexpr_obj_ref': str(res[6]) + '/' + str(res[0]) + '/' + str(res[4])}
 
         print('Uploaded object: ')
         print(returnVal)
@@ -277,8 +281,7 @@ class DifferentialExpressionUtils:
         for f in glob.glob(output_dir + '/*.zip'):
             os.remove(f)
 
-        returnVal = {'ws_id': info[6],
-                     'destination_dir': output_dir}
+        returnVal = {'destination_dir': output_dir}
 
         #END download_differentialExpression
 
