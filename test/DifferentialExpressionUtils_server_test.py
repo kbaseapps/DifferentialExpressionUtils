@@ -6,6 +6,7 @@ import time
 from datetime import datetime
 from distutils.dir_util import copy_tree
 import requests
+import inspect
 
 from os import environ
 try:
@@ -92,7 +93,9 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
 
         copy_tree('data/cuffdiff_output', cls.upload_dir_path)
 
+
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
+
     def test_upload_differentialExpression(self):
 
         params = {
@@ -103,7 +106,6 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                   'tool_version': '2.2.1',
                   'diffexpr_filename': 'gene_exp.diff'
                   }
-
         retVal = self.getImpl().upload_differentialExpression(self.ctx, params)[0]
 
         inputObj = self.dfu.get_objects(
@@ -126,3 +128,93 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         self.assertEqual(d['expressionSet_id'], '4389/18/2')
         self.assertEqual(d['alignmentSet_id'], inputObj['data']['alignmentSet_id'])
         self.assertEqual(d['sampleset_id'], inputObj['data']['sampleset_id'])
+
+    def fail_upload_diffexpr(self, params, error, exception=ValueError, do_startswith=False):
+
+        test_name = inspect.stack()[1][3]
+        print('\n*** starting expected upload fail test: ' + test_name + ' **')
+
+        with self.assertRaises(exception) as context:
+            self.getImpl().upload_differentialExpression(self.ctx, params)
+        if do_startswith:
+            self.assertTrue(str(context.exception.message).startswith(error),
+                            "Error message {} does not start with {}".format(
+                                str(context.exception.message),
+                                error))
+        else:
+            self.assertEqual(error, str(context.exception.message))
+
+    def test_upload_fail_no_dst_ref(self):
+        self.fail_upload_diffexpr({
+                                    'source_dir': self.upload_dir_path,
+                                    'expressionset_ref': '4389/18/2',
+                                    'tool_used': 'cuffdiff',
+                                    'tool_version': '2.2.1',
+                                    'diffexpr_filename': 'gene_exp.diff'
+                                  },
+                                  'destination_ref parameter is required')
+
+    def test_upload_fail_no_ws_name(self):
+        self.fail_upload_diffexpr({
+                                    'destination_ref': '/foo',
+                                    'source_dir': self.upload_dir_path,
+                                    'expressionset_ref': '4389/18/2',
+                                    'tool_used': 'cuffdiff',
+                                    'tool_version': '2.2.1',
+                                    'diffexpr_filename': 'gene_exp.diff'
+                                   },
+                                   'Workspace name or id is required in destination_ref')
+
+    def test_upload_fail_no_obj_name(self):
+        self.fail_upload_diffexpr({
+                                    'destination_ref': self.getWsName() + '/',
+                                    'source_dir': self.upload_dir_path,
+                                    'expressionset_ref': '4389/18/2',
+                                    'tool_used': 'cuffdiff',
+                                    'tool_version': '2.2.1',
+                                    'diffexpr_filename': 'gene_exp.diff'
+                                   },
+                                   'Object name or id is required in destination_ref')
+
+    def test_upload_fail_no_src_dir(self):
+        self.fail_upload_diffexpr({
+                                    'destination_ref': self.getWsName() + '/test_diffexpr',
+                                    'expressionset_ref': '4389/18/2',
+                                    'tool_used': 'cuffdiff',
+                                    'tool_version': '2.2.1',
+                                    'diffexpr_filename': 'gene_exp.diff'
+                                  },
+                                  'source_dir parameter is required')
+
+    def test_upload_fail_non_existant_src_dir(self):
+        self.fail_upload_diffexpr({
+                                    'destination_ref': self.getWsName() + '/test_diffexpr',
+                                    'source_dir': 'foo',
+                                    'expressionset_ref': '4389/18/2',
+                                    'tool_used': 'cuffdiff',
+                                    'tool_version': '2.2.1',
+                                    'diffexpr_filename': 'gene_exp.diff'
+                                  },
+                                  'Source directory does not exist: foo')
+
+    def test_upload_fail_bad_wsname(self):
+        self.fail_upload_diffexpr({
+                                    'destination_ref': '&bad' + '/foo',
+                                    'source_dir': 'foo',
+                                    'expressionset_ref': '4389/18/2',
+                                    'tool_used': 'cuffdiff',
+                                    'tool_version': '2.2.1',
+                                    'diffexpr_filename': 'gene_exp.diff'
+                                  },
+                                  'Illegal character in workspace name &bad: &')
+
+    def test_upload_fail_non_existant_wsname(self):
+        self.fail_upload_diffexpr({
+                                    'destination_ref': '1s' + '/foo',
+                                    'source_dir': 'foo',
+                                    'expressionset_ref': '4389/18/2',
+                                    'tool_used': 'cuffdiff',
+                                    'tool_version': '2.2.1',
+                                    'diffexpr_filename': 'gene_exp.diff'
+                                  },
+                                  'No workspace with name 1s exists')
