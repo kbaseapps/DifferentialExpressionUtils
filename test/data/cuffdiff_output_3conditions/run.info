@@ -1,0 +1,5 @@
+param	value
+cmd_line	cuffdiff -p 8 -c 10 --library-type fr-unstranded --library-norm-method classic-fpkm -o cuffdiff_out -L ecoli_glutamine,ecoli_heatshock,ecoli_stationary -u cuffmerge_out/merged.gtf glutamine_R1/accepted_hits.bam,glutamine_R2/accepted_hits.bam heatshock_R1/accepted_hits.bam,heatshock_R2/accepted_hits.bam stationary_R1/accepted_hits.bam,stationary_R2/accepted_hits.bam 
+version	2.2.1
+SVN_revision	4237
+boost_version	104700

@@ -1,0 +1,5 @@
+file	condition	replicate_num	total_mass	norm_mass	internal_scale	external_scale
+/kb/module/work/tmp/WT_download_1499443380261/accepted_hits.bam	WT	0	11572	7350.75	1.57399	1
+/kb/module/work/tmp/WT_download_1499443404850/accepted_hits.bam	WT	1	11555	7350.75	1.57181	1
+/kb/module/work/tmp/hy5_download_1499443429439/accepted_hits.bam	hy5	0	3156	7350.75	0.429072	1
+/kb/module/work/tmp/hy5_download_1499443454157/accepted_hits.bam	hy5	1	3126	7350.75	0.425127	1

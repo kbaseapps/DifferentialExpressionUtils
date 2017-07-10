@@ -1,0 +1,7 @@
+file	condition	replicate_num	total_mass	norm_mass	internal_scale	external_scale
+glutamine_R1/accepted_hits.bam	ecoli_glutamine	0	539788	519271	1.03951	1
+glutamine_R2/accepted_hits.bam	ecoli_glutamine	1	404656	519271	0.779277	1
+heatshock_R1/accepted_hits.bam	ecoli_heatshock	0	378559	519271	0.72902	1
+heatshock_R2/accepted_hits.bam	ecoli_heatshock	1	607466	519271	1.16984	1
+stationary_R1/accepted_hits.bam	ecoli_stationary	0	606365	519271	1.16772	1
+stationary_R2/accepted_hits.bam	ecoli_stationary	1	578794	519271	1.11463	1

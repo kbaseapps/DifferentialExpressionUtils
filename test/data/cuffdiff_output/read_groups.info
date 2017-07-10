@@ -1,5 +1,0 @@
-file	condition	replicate_num	total_mass	norm_mass	internal_scale	external_scale
-/kb/module/work/tmp/cuffdiff_merge_58fcae5f-3679-4676-a894-d37682c348fe/expset_43ef26be-b659-4fe4-a6cd-292b9fe98338/WT_1_hisat2_alignment/accepted_hits.bam	WT	0	0	0	1	1
-/kb/module/work/tmp/cuffdiff_merge_58fcae5f-3679-4676-a894-d37682c348fe/expset_43ef26be-b659-4fe4-a6cd-292b9fe98338/WT_2_hisat2_alignment/accepted_hits.bam	WT	0	0	0	1	1
-/kb/module/work/tmp/cuffdiff_merge_58fcae5f-3679-4676-a894-d37682c348fe/expset_43ef26be-b659-4fe4-a6cd-292b9fe98338/hy5_1_hisat2_alignment/accepted_hits.bam	hy5	0	0	0	1	1
-/kb/module/work/tmp/cuffdiff_merge_58fcae5f-3679-4676-a894-d37682c348fe/expset_43ef26be-b659-4fe4-a6cd-292b9fe98338/hy5_2_hisat2_alignment/accepted_hits.bam	hy5	0	0	0	1	1

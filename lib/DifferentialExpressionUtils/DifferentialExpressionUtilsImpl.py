@@ -12,6 +12,7 @@ from DataFileUtil.DataFileUtilClient import DataFileUtil
 from DataFileUtil.baseclient import ServerError as DFUError
 from Workspace.WorkspaceClient import Workspace
 from Workspace.baseclient import ServerError as WorkspaceError
+from core.diffExprMatrix_utils import GenDiffExprMatrix
 #END_HEADER
 
 
@@ -62,9 +63,9 @@ class DifferentialExpressionUtils:
         """
         dst_ref = params.get(self.PARAM_IN_DST_REF)
 
-        ws_name_id, obj_name_id = os.path.split(dst_ref)
+        ws_name, obj_name_id = os.path.split(dst_ref)
 
-        if not bool(ws_name_id.strip()) or ws_name_id == '/':
+        if not bool(ws_name.strip()) or ws_name == '/':
             raise ValueError("Workspace name or id is required in " + self.PARAM_IN_DST_REF)
 
         if not bool(obj_name_id.strip()):
@@ -72,17 +73,17 @@ class DifferentialExpressionUtils:
 
         dfu = DataFileUtil(self.callback_url)
 
-        if not isinstance(ws_name_id, int):
+        if not isinstance(ws_name, int):
 
             try:
-                ws_name_id = dfu.ws_name_to_id(ws_name_id)
+                ws_id = dfu.ws_name_to_id(ws_name)
             except DFUError as se:
                 prefix = se.message.split('.')[0]
                 raise ValueError(prefix)
 
-        self.log('Obtained workspace name/id ' + str(ws_name_id))
+        self.log('Obtained workspace name/id ' + str(ws_id))
 
-        return ws_name_id, obj_name_id
+        return ws_name, ws_id, obj_name_id
 
     def _proc_upload_diffexpr_params(self, ctx, params):
         """
@@ -96,7 +97,7 @@ class DifferentialExpressionUtils:
                                             self.PARAM_IN_DIFFEXP_FILENAME
                                             ])
 
-        ws_name_id, obj_name_id = self._proc_ws_obj_params(ctx, params)
+        ws_name, ws_id, obj_name_id = self._proc_ws_obj_params(ctx, params)
 
         source_dir = params.get(self.PARAM_IN_SRC_DIR)
 
@@ -106,7 +107,7 @@ class DifferentialExpressionUtils:
         if not os.listdir(source_dir):
             raise ValueError('Source directory is empty: ' + source_dir)
 
-        return ws_name_id, obj_name_id, source_dir
+        return ws_name, ws_id, obj_name_id, source_dir
 
     def _get_ws_info(self, obj_ref):
 
@@ -126,6 +127,11 @@ class DifferentialExpressionUtils:
         """
         expression_set = self.ws_client.get_objects2(
                             {'objects': [{'ref': expressionset_ref}]})['data'][0]
+
+        if not expression_set.get('info')[2].startswith('KBaseRNASeq.RNASeqExpressionSet'):
+            raise TypeError('"{}" should be of type KBaseRNASeq.RNASeqExpressionSet'
+                            .format(self.PARAM_IN_EXPR_SET_REF))
+
         expression_set_data = expression_set['data']
 
         diffexpr_data = {}
@@ -162,9 +168,9 @@ class DifferentialExpressionUtils:
         self.ws_url = config['workspace-url']
         self.ws_client = Workspace(self.ws_url)
         self.dfu = DataFileUtil(self.callback_url)
+        self.demu = GenDiffExprMatrix(config)
         #END_CONSTRUCTOR
         pass
-
 
     def upload_differentialExpression(self, ctx, params):
         """
@@ -194,19 +200,31 @@ class DifferentialExpressionUtils:
         self.log('Starting upload differential expression, parsing parameters ')
         pprint(params)
 
-        ws_name_id, obj_name_id, source_dir = self._proc_upload_diffexpr_params(ctx, params)
+        ws_name, ws_id, obj_name_id, source_dir = self._proc_upload_diffexpr_params(ctx, params)
+
+        print('*****************  ws_name: ' + ws_name)
+        print('*****************  obj_name_id: ' + str(obj_name_id))
+
+        diff_expression_data = self._get_diffexpr_data(params.get(self.PARAM_IN_EXPR_SET_REF))
+
+        # add more to params to pass on to create diff expr matrix
+
+        params['genome_ref'] = diff_expression_data.get('genome_id')
+        params['ws_name'] = ws_name
+        params['obj_name'] = obj_name_id
+
+        demset_ref = self.demu.gen_diffexpr_matrices(params)
 
         handle = self.dfu.file_to_shock({'file_path': source_dir,
                                          'make_handle': 1,
                                          'pack': 'zip'
                                           })['handle']
 
-        diff_expression_data = self._get_diffexpr_data(params.get(self.PARAM_IN_EXPR_SET_REF))
         diff_expression_data.update({'file': handle})
         diff_expression_data.update({'tool_used': params.get(self.PARAM_IN_TOOL_USED)})
         diff_expression_data.update({'tool_version': params.get(self.PARAM_IN_TOOL_VER)})
 
-        res = self.ws_client.save_objects({'id': ws_name_id,
+        res = self.ws_client.save_objects({'id': ws_id,
                                             "objects": [{
                                                     "type": "KBaseRNASeq.RNASeqDifferentialExpression",
                                                     "data": diff_expression_data,
