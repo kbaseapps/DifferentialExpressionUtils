@@ -367,7 +367,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
 
     def test_upload_fail_no_dst_ref(self):
         self.fail_upload_diffexpr({
-                                    'source_dir': self.upload_cuffdiff_dir_path,
+                                    'source_dir': self.upload_cuffdiff2_dir_path,
                                     'expressionset_ref': self.narrative_expressionset_ref,
                                     'tool_used': 'cuffdiff',
                                     'tool_version': '2.2.1',
@@ -378,7 +378,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
     def test_upload_fail_no_ws_name(self):
         self.fail_upload_diffexpr({
                                     'destination_ref': '/foo',
-                                    'source_dir': self.upload_cuffdiff_dir_path,
+                                    'source_dir': self.upload_cuffdiff2_dir_path,
                                     'expressionset_ref': self.narrative_expressionset_ref,
                                     'tool_used': 'cuffdiff',
                                     'tool_version': '2.2.1',
@@ -389,7 +389,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
     def test_upload_fail_no_obj_name(self):
         self.fail_upload_diffexpr({
                                     'destination_ref': self.getWsName() + '/',
-                                    'source_dir': self.upload_cuffdiff_dir_path,
+                                    'source_dir': self.upload_cuffdiff2_dir_path,
                                     'expressionset_ref': self.narrative_expressionset_ref,
                                     'tool_used': 'cuffdiff',
                                     'tool_version': '2.2.1',
@@ -421,7 +421,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
     def test_upload_fail_no_diffexpr_filename(self):
         self.fail_upload_diffexpr({
                                     'destination_ref': self.getWsName() + '/test_diffexpr',
-                                    'source_dir': self.upload_cuffdiff_dir_path,
+                                    'source_dir': self.upload_cuffdiff2_dir_path,
                                     'expressionset_ref': self.narrative_expressionset_ref,
                                     'tool_used': 'cuffdiff',
                                     'tool_version': '2.2.1'
@@ -453,7 +453,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
     def test_upload_fail_non_expset_ref(self):
         self.fail_upload_diffexpr({
                                     'destination_ref': self.getWsName() + '/test_diffexpr',
-                                    'source_dir': self.upload_cuffdiff_dir_path,
+                                    'source_dir': self.upload_cuffdiff2_dir_path,
                                     'expressionset_ref': self.genome_ref,
                                     'tool_used': 'cuffdiff',
                                     'tool_version': '2.2.1',
