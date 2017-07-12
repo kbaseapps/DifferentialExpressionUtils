@@ -33,7 +33,7 @@ class DifferentialExpressionUtils:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/kbaseapps/DifferentialExpressionUtils.git"
-    GIT_COMMIT_HASH = "c6e863f81fe44459e1c7ae201a8c1105e9887cc7"
+    GIT_COMMIT_HASH = "76ae39b906473558b32b54acd66385e7474b0115"
 
     #BEGIN_CLASS_HEADER
 
@@ -172,6 +172,7 @@ class DifferentialExpressionUtils:
         #END_CONSTRUCTOR
         pass
 
+
     def upload_differentialExpression(self, ctx, params):
         """
         Uploads the differential expression  *
@@ -182,12 +183,16 @@ class DifferentialExpressionUtils:
            'ws_name_or_id/obj_name_or_id' where ws_name_or_id is the
            workspace name or id and obj_name_or_id is the object name or id
            string   source_dir             -   directory with the files to be
-           uploaded string   expressionSet_ref      -   expressionSet object
+           uploaded string   expressionset_ref      -   expressionset object
            reference string   tool_used              -   cufflinks, ballgown
            or deseq string   tool_version           -   version of the tool
-           used *) -> structure: parameter "destination_ref" of String,
-           parameter "source_dir" of String, parameter "expressionSet_ref" of
+           used string   diffexpr_filename      -   name of the differential
+           expression data file in source_dir, created by cuffdiff, deseq or
+           ballgown *) -> structure: parameter "destination_ref" of String,
+           parameter "source_dir" of String, parameter "expressionset_ref" of
            String, parameter "tool_used" of String, parameter "tool_version"
+           of String, parameter "diffexpr_filename" of String, parameter
+           "tool_opts" of mapping from String to String, parameter "comments"
            of String
         :returns: instance of type "UploadDifferentialExpressionOutput" (*   
            Output from upload differential expression    *) -> structure:
@@ -202,9 +207,6 @@ class DifferentialExpressionUtils:
 
         ws_name, ws_id, obj_name_id, source_dir = self._proc_upload_diffexpr_params(ctx, params)
 
-        print('*****************  ws_name: ' + ws_name)
-        print('*****************  obj_name_id: ' + str(obj_name_id))
-
         diff_expression_data = self._get_diffexpr_data(params.get(self.PARAM_IN_EXPR_SET_REF))
 
         # add more to params to pass on to create diff expr matrix
@@ -213,7 +215,7 @@ class DifferentialExpressionUtils:
         params['ws_name'] = ws_name
         params['obj_name'] = obj_name_id
 
-        demset_ref = self.demu.gen_diffexpr_matrices(params)
+        #demset_ref = self.demu.gen_diffexpr_matrices(params)
 
         handle = self.dfu.file_to_shock({'file_path': source_dir,
                                          'make_handle': 1,
@@ -251,15 +253,14 @@ class DifferentialExpressionUtils:
         Downloads expression *
         :param params: instance of type
            "DownloadDifferentialExpressionParams" (* Required input
-           parameters for downloading Differential expression string
-           source_ref         -       object reference of expression source.
-           The object ref is 'ws_name_or_id/obj_name_or_id' where
-           ws_name_or_id is the workspace name or id and obj_name_or_id is
-           the object name or id *) -> structure: parameter "source_ref" of
-           String
+           parameters for downloading Differential expression string 
+           source_ref   -      object reference of expression source. The
+           object ref is 'ws_name_or_id/obj_name_or_id' where ws_name_or_id
+           is the workspace name or id and obj_name_or_id is the object name
+           or id *) -> structure: parameter "source_ref" of String
         :returns: instance of type "DownloadDifferentialExpressionOutput" (* 
            The output of the download method.  *) -> structure: parameter
-           "ws_id" of String, parameter "destination_dir" of String
+           "destination_dir" of String
         """
         # ctx is the context object
         # return variables are: returnVal
@@ -272,12 +273,8 @@ class DifferentialExpressionUtils:
         if not inref:
             raise ValueError('{} parameter is required'.format(self.PARAM_IN_SRC_REF))
 
-        info = self._get_ws_info(inref)
-
-        obj_ref = str(info[6]) + '/' + str(info[0])
-
         try:
-            expression = self.dfu.get_objects({'object_refs': [obj_ref]})['data']
+            expression = self.dfu.get_objects({'object_refs': [inref]})['data']
         except DFUError as e:
             self.log('Logging stacktrace from workspace exception:\n' + e.data)
             raise
@@ -330,12 +327,8 @@ class DifferentialExpressionUtils:
         if not inref:
             raise ValueError(self.PARAM_IN_SRC_REF + ' parameter is required')
 
-        info = self._get_ws_info(inref)
-
-        obj_ref = str(info[6]) + '/' + str(info[0])
-
         try:
-            expression = self.dfu.get_objects({'object_refs': [obj_ref]})['data']
+            expression = self.dfu.get_objects({'object_refs': [inref]})['data']
         except DFUError as e:
             self.log('Logging stacktrace from workspace exception:\n' + e.data)
             raise

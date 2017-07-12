@@ -124,9 +124,12 @@ $return is a DifferentialExpressionUtils.UploadDifferentialExpressionOutput
 UploadDifferentialExpressionParams is a reference to a hash where the following keys are defined:
 	destination_ref has a value which is a string
 	source_dir has a value which is a string
-	expressionSet_ref has a value which is a string
+	expressionset_ref has a value which is a string
 	tool_used has a value which is a string
 	tool_version has a value which is a string
+	diffexpr_filename has a value which is a string
+	tool_opts has a value which is a reference to a hash where the key is a string and the value is a string
+	comments has a value which is a string
 UploadDifferentialExpressionOutput is a reference to a hash where the following keys are defined:
 	obj_ref has a value which is a string
 
@@ -141,9 +144,12 @@ $return is a DifferentialExpressionUtils.UploadDifferentialExpressionOutput
 UploadDifferentialExpressionParams is a reference to a hash where the following keys are defined:
 	destination_ref has a value which is a string
 	source_dir has a value which is a string
-	expressionSet_ref has a value which is a string
+	expressionset_ref has a value which is a string
 	tool_used has a value which is a string
 	tool_version has a value which is a string
+	diffexpr_filename has a value which is a string
+	tool_opts has a value which is a reference to a hash where the key is a string and the value is a string
+	comments has a value which is a string
 UploadDifferentialExpressionOutput is a reference to a hash where the following keys are defined:
 	obj_ref has a value which is a string
 
@@ -222,7 +228,6 @@ $return is a DifferentialExpressionUtils.DownloadDifferentialExpressionOutput
 DownloadDifferentialExpressionParams is a reference to a hash where the following keys are defined:
 	source_ref has a value which is a string
 DownloadDifferentialExpressionOutput is a reference to a hash where the following keys are defined:
-	ws_id has a value which is a string
 	destination_dir has a value which is a string
 
 </pre>
@@ -236,7 +241,6 @@ $return is a DifferentialExpressionUtils.DownloadDifferentialExpressionOutput
 DownloadDifferentialExpressionParams is a reference to a hash where the following keys are defined:
 	source_ref has a value which is a string
 DownloadDifferentialExpressionOutput is a reference to a hash where the following keys are defined:
-	ws_id has a value which is a string
 	destination_dir has a value which is a string
 
 
@@ -522,9 +526,11 @@ an int
                                             where ws_name_or_id is the workspace name or id
                                             and obj_name_or_id is the object name or id
         string   source_dir             -   directory with the files to be uploaded
-        string   expressionSet_ref      -   expressionSet object reference
+        string   expressionset_ref      -   expressionset object reference
         string   tool_used              -   cufflinks, ballgown or deseq
         string   tool_version           -   version of the tool used
+        string   diffexpr_filename      -   name of the differential expression data file
+                                            in source_dir, created by cuffdiff, deseq or ballgown
     *
 
 
@@ -536,9 +542,12 @@ an int
 a reference to a hash where the following keys are defined:
 destination_ref has a value which is a string
 source_dir has a value which is a string
-expressionSet_ref has a value which is a string
+expressionset_ref has a value which is a string
 tool_used has a value which is a string
 tool_version has a value which is a string
+diffexpr_filename has a value which is a string
+tool_opts has a value which is a reference to a hash where the key is a string and the value is a string
+comments has a value which is a string
 
 </pre>
 
@@ -549,9 +558,12 @@ tool_version has a value which is a string
 a reference to a hash where the following keys are defined:
 destination_ref has a value which is a string
 source_dir has a value which is a string
-expressionSet_ref has a value which is a string
+expressionset_ref has a value which is a string
 tool_used has a value which is a string
 tool_version has a value which is a string
+diffexpr_filename has a value which is a string
+tool_opts has a value which is a reference to a hash where the key is a string and the value is a string
+comments has a value which is a string
 
 
 =end text
@@ -605,7 +617,7 @@ obj_ref has a value which is a string
 
 *
 Required input parameters for downloading Differential expression
-string source_ref         -       object reference of expression source. The
+string  source_ref   -      object reference of expression source. The
                             object ref is 'ws_name_or_id/obj_name_or_id'
                             where ws_name_or_id is the workspace name or id
                             and obj_name_or_id is the object name or id
@@ -653,7 +665,6 @@ source_ref has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-ws_id has a value which is a string
 destination_dir has a value which is a string
 
 </pre>
@@ -663,7 +674,6 @@ destination_dir has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-ws_id has a value which is a string
 destination_dir has a value which is a string
 
 

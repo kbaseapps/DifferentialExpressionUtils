@@ -43,12 +43,16 @@ class DifferentialExpressionUtils(object):
            'ws_name_or_id/obj_name_or_id' where ws_name_or_id is the
            workspace name or id and obj_name_or_id is the object name or id
            string   source_dir             -   directory with the files to be
-           uploaded string   expressionSet_ref      -   expressionSet object
+           uploaded string   expressionset_ref      -   expressionset object
            reference string   tool_used              -   cufflinks, ballgown
            or deseq string   tool_version           -   version of the tool
-           used *) -> structure: parameter "destination_ref" of String,
-           parameter "source_dir" of String, parameter "expressionSet_ref" of
+           used string   diffexpr_filename      -   name of the differential
+           expression data file in source_dir, created by cuffdiff, deseq or
+           ballgown *) -> structure: parameter "destination_ref" of String,
+           parameter "source_dir" of String, parameter "expressionset_ref" of
            String, parameter "tool_used" of String, parameter "tool_version"
+           of String, parameter "diffexpr_filename" of String, parameter
+           "tool_opts" of mapping from String to String, parameter "comments"
            of String
         :returns: instance of type "UploadDifferentialExpressionOutput" (*   
            Output from upload differential expression    *) -> structure:
@@ -63,15 +67,14 @@ class DifferentialExpressionUtils(object):
         Downloads expression *
         :param params: instance of type
            "DownloadDifferentialExpressionParams" (* Required input
-           parameters for downloading Differential expression string
-           source_ref         -       object reference of expression source.
-           The object ref is 'ws_name_or_id/obj_name_or_id' where
-           ws_name_or_id is the workspace name or id and obj_name_or_id is
-           the object name or id *) -> structure: parameter "source_ref" of
-           String
+           parameters for downloading Differential expression string 
+           source_ref   -      object reference of expression source. The
+           object ref is 'ws_name_or_id/obj_name_or_id' where ws_name_or_id
+           is the workspace name or id and obj_name_or_id is the object name
+           or id *) -> structure: parameter "source_ref" of String
         :returns: instance of type "DownloadDifferentialExpressionOutput" (* 
            The output of the download method.  *) -> structure: parameter
-           "ws_id" of String, parameter "destination_dir" of String
+           "destination_dir" of String
         """
         return self._client.call_method(
             'DifferentialExpressionUtils.download_differentialExpression',

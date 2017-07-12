@@ -21,31 +21,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
-    "ws_id",
     "destination_dir"
 })
 public class DownloadDifferentialExpressionOutput {
 
-    @JsonProperty("ws_id")
-    private String wsId;
     @JsonProperty("destination_dir")
     private String destinationDir;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
-    @JsonProperty("ws_id")
-    public String getWsId() {
-        return wsId;
-    }
-
-    @JsonProperty("ws_id")
-    public void setWsId(String wsId) {
-        this.wsId = wsId;
-    }
-
-    public DownloadDifferentialExpressionOutput withWsId(String wsId) {
-        this.wsId = wsId;
-        return this;
-    }
 
     @JsonProperty("destination_dir")
     public String getDestinationDir() {
@@ -74,7 +56,7 @@ public class DownloadDifferentialExpressionOutput {
 
     @Override
     public String toString() {
-        return ((((((("DownloadDifferentialExpressionOutput"+" [wsId=")+ wsId)+", destinationDir=")+ destinationDir)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((("DownloadDifferentialExpressionOutput"+" [destinationDir=")+ destinationDir)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }
