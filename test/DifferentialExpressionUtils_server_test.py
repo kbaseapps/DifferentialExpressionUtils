@@ -81,36 +81,8 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         return self.__class__.ctx
 
     @classmethod
-    def setupTestDataOrig(cls):
-        """
-        sets up files for upload
-        """
-        timestamp = int((datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds() * 1000)
-
-        cls.upload_cuffdiff2_dir = 'upload_cuffdiff2_' + str(timestamp)
-        cls.upload_cuffdiff2_dir_path = os.path.join(cls.scratch, cls.upload_cuffdiff2_dir)
-        cls.uploaded_cuffdiff2_zip = cls.upload_cuffdiff2_dir + '.zip'
-
-        cls.upload_cuffdiff3_dir = 'upload_cuffdiff3_' + str(timestamp)
-        cls.upload_cuffdiff3_dir_path = os.path.join(cls.scratch, cls.upload_cuffdiff3_dir)
-        cls.uploaded_cuffdiff3_zip = cls.upload_cuffdiff3_dir + '.zip'
-
-        cls.upload_deseq_dir = 'upload_deseq_' + str(timestamp)
-        cls.upload_deseq_dir_path = os.path.join(cls.scratch, cls.upload_deseq_dir)
-        cls.uploaded_deseq_zip = cls.upload_deseq_dir + '.zip'
-
-        cls.upload_ballgown_dir = 'upload_ballgown_' + str(timestamp)
-        cls.upload_ballgown_dir_path = os.path.join(cls.scratch, cls.upload_ballgown_dir)
-        cls.uploaded_ballgown_zip = cls.upload_ballgown_dir + '.zip'
-
-        copy_tree('data/cuffdiff_output_2conditions', cls.upload_cuffdiff2_dir_path)
-        copy_tree('data/cuffdiff_output_3conditions', cls.upload_cuffdiff3_dir_path)
-        copy_tree('data/deseq_output', cls.upload_deseq_dir_path)
-        copy_tree('data/ballgown_output', cls.upload_ballgown_dir_path)
-
-
-    @classmethod
     def setupTestData(cls):
+        '''
         genbank_file_name = 'minimal.gbff'
         genbank_file_path = os.path.join(cls.scratch, genbank_file_name)
         shutil.copy(os.path.join('data', genbank_file_name), genbank_file_path)
@@ -120,49 +92,45 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                                     'workspace_name': cls.wsName,
                                                     'genome_name': genome_object_name
                                                     })['genome_ref']
+        '''
+        cls.narrative_genome_ref = '23837/2/1'
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
 
-    '''
+    @unittest.skip("skipped test_upload_cuffdiff_differentialExpression")
     def test_upload_cuffdiff_differentialExpression(self):
 
         params = {
                   'destination_ref': self.getWsName() + '/test_cuffdiff_diffexp',
-                  'source_dir': self.upload_cuffdiff2_dir_path,
-                  'expressionset_ref': self.narrative_expressionset_ref,
+                  'genome_ref': self.narrative_genome_ref,
                   'tool_used': 'cuffdiff',
                   'tool_version': '2.2.1',
-                  'diffexpr_filename': 'gene_exp_.csv'
+                  'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp_small.diff'
                   }
         retVal = self.getImpl().upload_differentialExpression(self.ctx, params)[0]
 
-        inputObj = self.dfu.get_objects(
-            {'object_refs': [self.narrative_expressionset_ref]})['data'][0]
-
-        print("============ INPUT EXPRESSION SET OBJECT ==============")
-        pprint(inputObj)
-        print("==========================================================")
-
         obj = self.dfu.get_objects(
-            {'object_refs': [retVal.get('diffexpr_obj_ref')]})['data'][0]
+            {'object_refs': [retVal.get('diffExprMatrixSet_ref')]})['data'][0]
 
-        print("============ DIFFERENTIAL EXPRESSION OUTPUT ==============")
+        print("============ DIFFERENTIAL EXPRESSION MATRIX OUTPUT ==============")
         pprint(obj)
         print("==========================================================")
 
+        '''
         self.assertEqual(obj['info'][2].startswith('KBaseRNASeq.RNASeqDifferentialExpression'), True)
         d = obj['data']
         self.assertEqual(d['genome_id'], inputObj['data']['genome_id'])
         self.assertEqual(d['expressionSet_id'], self.narrative_expressionset_ref)
         self.assertEqual(d['alignmentSet_id'], inputObj['data']['alignmentSet_id'])
         self.assertEqual(d['sampleset_id'], inputObj['data']['sampleset_id'])
-    '''
+        '''
 
+    @unittest.skip("skipped test_upload_deseq_differentialExpression")
     def test_upload_deseq_differentialExpression(self):
 
         params = {
                   'destination_ref': self.getWsName() + '/test_deseq_diffexp',
-                  'genome_ref': self.genome_ref,
+                  'genome_ref': self.narrative_genome_ref,
                   'tool_used': 'deseq',
                   'tool_version': 'deseq_version',
                   'diffexpr_filepath': 'data/deseq_output/sig_genes_results_small.csv'
@@ -172,16 +140,16 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         obj = self.dfu.get_objects(
             {'object_refs': [retVal.get('diffExprMatrixSet_ref')]})['data'][0]
 
-        print("============ DIFFERENTIAL EXPRESSION OUTPUT ==============")
+        print("============ DIFFERENTIAL EXPRESSION MATRIX OUTPUT ==============")
         pprint(obj)
         print("==========================================================")
 
-    '''
+    #@unittest.skip("skipped test_upload_ballgown_differentialExpression")
     def test_upload_ballgown_differentialExpression(self):
 
         params = {
                   'destination_ref': self.getWsName() + '/test_ballgown_diffexp',
-                  'genome_ref': self.genome_ref,
+                  'genome_ref': self.narrative_genome_ref,
                   'tool_used': 'ballgown',
                   'tool_version': 'ballgown_version',
                   'diffexpr_filepath': 'data/ballgown_output/ballgown_diffexp_small.tsv'
@@ -194,10 +162,9 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         obj = self.dfu.get_objects(
             {'object_refs': [retVal.get('diffExprMatrixSet_ref')]})['data'][0]
 
-        print("============ DIFFERENTIAL EXPRESSION OUTPUT ==============")
+        print("============ DIFFERENTIAL EXPRESSION MATRIX OUTPUT ==============")
         pprint(obj)
         print("==========================================================")
-    '''
 
     '''  
     def fail_upload_diffexpr(self, params, error, exception=ValueError, do_startswith=False):

@@ -38,9 +38,9 @@ class GenDiffExprMatrix:
 
         self.new_col_names = ['gene_id', 'log2_fold_change', 'p_value', 'q_value']
 
-    def gen_matrix(self, infile, old_col_names, delimiter, skipspace=False):
+    def gen_matrix(self, infile, old_col_names, delimiter):
         with open(infile, 'rb') as source:
-            rdr = csv.DictReader(source, delimiter=delimiter, skipinitialspace=skipspace)
+            rdr = csv.DictReader(source, delimiter=delimiter)
             col_names = self.new_col_names[1:]
             print col_names
             row_names = []
@@ -107,7 +107,7 @@ class GenDiffExprMatrix:
 
                     wtr.writerow(line)
 
-    def save_diff_expr_matrix(self, data_matrix, condition1, condition2):
+    def save_diff_expr_matrix(self, obj_name, data_matrix, condition1, condition2):
 
         dem_data = {
             'data': data_matrix,
@@ -119,7 +119,7 @@ class GenDiffExprMatrix:
                                            "objects": [{
                                                "type": "KBaseFeatureValues.DifferentialExpressionMatrix",
                                                "data": dem_data,
-                                               "name": self.params.get('obj_name')
+                                               "name": obj_name
                                            }]
                                            })[0]
         ret_ref = str(res[6]) + '/' + str(res[0]) + '/' + str(res[4])
@@ -133,11 +133,11 @@ class GenDiffExprMatrix:
         ballgown_col_names = ['id', 'fc', 'pval', 'qval']
 
         data_matrix = self.gen_matrix(diffexpr_filepath,
-                        ballgown_col_names,
-                        delimiter=' ',
-                        skipspace=True)
+                                      ballgown_col_names,
+                                      delimiter='\t')
 
-        dem_ref = self.save_diff_expr_matrix(data_matrix, None, None)
+        dem_ref = self.save_diff_expr_matrix(self.params.get('obj_name'),
+                                             data_matrix, None, None)
         print('process_ballgown_file: DEM_REF: ' + dem_ref)
         return dem_ref
 
@@ -153,7 +153,8 @@ class GenDiffExprMatrix:
                                       deseq_col_names,
                                       delimiter=',')
 
-        dem_ref = self.save_diff_expr_matrix(data_matrix, None, None)
+        dem_ref = self.save_diff_expr_matrix(self.params.get('obj_name'),
+                                             data_matrix, None, None)
         return dem_ref
 
 
@@ -185,7 +186,7 @@ class GenDiffExprMatrix:
                     tsv_file_path = os.path.join(self.scratch, tsv_file_name)
                     outfile = open(tsv_file_path, 'wb')
                     csv_wtr = csv.DictWriter(outfile, delimiter='\t', fieldnames=self.new_col_names)
-                    csv_wtr.writerow(dict((cn, cn) for cn in new_col_names))
+                    csv_wtr.writerow(dict((cn, cn) for cn in self.new_col_names))
                     condPair_fileInfo[cond_pair] = FileInfo(file_path=tsv_file_path,
                                                             file_obj=csv_wtr)
                 else:
@@ -195,26 +196,31 @@ class GenDiffExprMatrix:
                     wtr.writerow(dict(zip(self.new_col_names, col_vals)))
 
             count = 0
+            dem_ref_list = []
             for cond_pair, file_info in condPair_fileInfo.iteritems():
                 print 'Cond_pair: ', cond_pair
                 print 'File: ', file_info.file_path
-                condition_mapping = {cond_pair.condition1: cond_pair.condition2}
                 tsv_file = file_info.file_path
                 self.replace_inf(tsv_file, tsv_file+'.tsv')
-                tsv_file_to_DEmatrix_params = {'input_file_path': tsv_file,
-                                               'genome_ref': self.params.get('genome_ref'),
-                                               'data_type': 'log2_level',
-                                               'data_scale': '1.0',
-                                               'output_ws_name': self.params.get('ws_name'),
-                                               'output_obj_name': self.params.get('obj_name')
-                                                                  + 'DEM_' + str(count)}
+
+                data_matrix = self.gen_matrix(diffexpr_filepath,
+                                              cuffdiff_col_names,
+                                              delimiter='\t')
+
+                dem_ref = self.save_diff_expr_matrix(self.params.get('obj_name')+'_'+str(count),
+                                                                     data_matrix,
+                                                                     cond_pair.condition1,
+                                                                     cond_pair.condition2)
+                print('process_cuffdiff_file: DEM_REF: ' + dem_ref)
+                dem_ref_list.append(dem_ref)
+
                 count += 1
-                matrix_ref = self.fv.tsv_file_to_matrix(tsv_file_to_DEmatrix_params)['output_matrix_ref']
 
                 print('^^^^^^^^^^^  CUFF  DIFF   ^^^^^^^^^^^^^^^^^')
                 print(cond_pair)
-                print(matrix_ref)
+                print(dem_ref)
                 print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+
 
     def create_diffexpr_matrix(self, tsv_file, condition1, condition2):
 
