@@ -43,7 +43,8 @@ class DifferentialExpressionUtils:
     PARAM_IN_TOOL_USED = 'tool_used'
     PARAM_IN_TOOL_VER = 'tool_version'
     PARAM_IN_EXPR_SET_REF = 'expressionset_ref'
-    PARAM_IN_DIFFEXP_FILENAME = 'diffexpr_filename'
+    PARAM_IN_GENOME_REF = 'genome_ref'
+    PARAM_IN_DIFFEXP_FILEPATH = 'diffexpr_filepath'
 
     def log(self, message, prefix_newline=False):
         print(('\n' if prefix_newline else '') +
@@ -90,24 +91,20 @@ class DifferentialExpressionUtils:
         Check the presence and validity of upload expression params
         """
         self._check_required_param(params, [self.PARAM_IN_DST_REF,
-                                            self.PARAM_IN_SRC_DIR,
-                                            self.PARAM_IN_EXPR_SET_REF,
+                                            self.PARAM_IN_GENOME_REF,
                                             self.PARAM_IN_TOOL_USED,
                                             self.PARAM_IN_TOOL_VER,
-                                            self.PARAM_IN_DIFFEXP_FILENAME
+                                            self.PARAM_IN_DIFFEXP_FILEPATH
                                             ])
 
         ws_name, ws_id, obj_name_id = self._proc_ws_obj_params(ctx, params)
 
-        source_dir = params.get(self.PARAM_IN_SRC_DIR)
+        diffexpr_filepath = params.get(self.PARAM_IN_DIFFEXP_FILEPATH)
 
-        if not (os.path.isdir(source_dir)):
-            raise ValueError('Source directory does not exist: ' + source_dir)
+        if not (os.path.isfile(diffexpr_filepath)):
+            raise ValueError('File {} does not exist: '.format(diffexpr_filepath))
 
-        if not os.listdir(source_dir):
-            raise ValueError('Source directory is empty: ' + source_dir)
-
-        return ws_name, ws_id, obj_name_id, source_dir
+        return ws_name, ws_id, obj_name_id
 
     def _get_ws_info(self, obj_ref):
 
@@ -172,7 +169,6 @@ class DifferentialExpressionUtils:
         #END_CONSTRUCTOR
         pass
 
-
     def upload_differentialExpression(self, ctx, params):
         """
         Uploads the differential expression  *
@@ -205,37 +201,20 @@ class DifferentialExpressionUtils:
         self.log('Starting upload differential expression, parsing parameters ')
         pprint(params)
 
-        ws_name, ws_id, obj_name_id, source_dir = self._proc_upload_diffexpr_params(ctx, params)
-
-        diff_expression_data = self._get_diffexpr_data(params.get(self.PARAM_IN_EXPR_SET_REF))
+        ws_name, ws_id, obj_name_id = self._proc_upload_diffexpr_params(ctx, params)
 
         # add more to params to pass on to create diff expr matrix
 
-        params['genome_ref'] = diff_expression_data.get('genome_id')
         params['ws_name'] = ws_name
+        params['ws_id'] = ws_id
         params['obj_name'] = obj_name_id
 
-        #demset_ref = self.demu.gen_diffexpr_matrices(params)
+        demset_ref = self.demu.gen_diffexpr_matrices(params)
 
-        handle = self.dfu.file_to_shock({'file_path': source_dir,
-                                         'make_handle': 1,
-                                         'pack': 'zip'
-                                          })['handle']
+        self.log('Differential Expression Matrix set ref: ')
+        pprint(demset_ref)
 
-        diff_expression_data.update({'file': handle})
-        diff_expression_data.update({'tool_used': params.get(self.PARAM_IN_TOOL_USED)})
-        diff_expression_data.update({'tool_version': params.get(self.PARAM_IN_TOOL_VER)})
-
-        res = self.ws_client.save_objects({'id': ws_id,
-                                            "objects": [{
-                                                    "type": "KBaseRNASeq.RNASeqDifferentialExpression",
-                                                    "data": diff_expression_data,
-                                                    "name": obj_name_id
-                                                    }]
-                                            })[0]
-        self.log('save complete')
-
-        returnVal = {'diffexpr_obj_ref': str(res[6]) + '/' + str(res[0]) + '/' + str(res[4])}
+        returnVal = {'diffExprMatrixSet_ref': demset_ref}
 
         print('Uploaded object: ')
         print(returnVal)

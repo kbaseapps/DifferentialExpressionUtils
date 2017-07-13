@@ -22,25 +22,26 @@ module DifferentialExpressionUtils {
                                             The object ref is 'ws_name_or_id/obj_name_or_id'
                                             where ws_name_or_id is the workspace name or id
                                             and obj_name_or_id is the object name or id
-        string   source_dir             -   directory with the files to be uploaded
-        string   expressionset_ref      -   expressionset object reference
+
+        string   diffexpr_filepath      -   file path of the differential expression data file
+                                            created by cuffdiff, deseq or ballgown
+
         string   tool_used              -   cufflinks, ballgown or deseq
         string   tool_version           -   version of the tool used
-        string   diffexpr_filename      -   name of the differential expression data file
-                                            in source_dir, created by cuffdiff, deseq or ballgown
+        string   genome_ref             -   genome object reference
     **/
 
     typedef structure {
 
         string   destination_ref;
-        string   source_dir;
-        string   expressionset_ref;
+        string   diffexpr_filepath;
         string   tool_used;
         string   tool_version;
-        string   diffexpr_filename;
+        string   genome_ref;
 
-        mapping<string opt_name, string opt_value> tool_opts;   /* Optional */
-        string   comments;                                      /* Optional */
+        string   description;               /* Optional */
+        string   type;                      /* Optional - default is 'log2_level'  */
+        string   scale;                     /* Optional - default is 1.0  */
 
     }  UploadDifferentialExpressionParams;
 
@@ -48,7 +49,7 @@ module DifferentialExpressionUtils {
     /**     Output from upload differential expression    **/
 
     typedef structure {
-        string   obj_ref;
+        string   diffExprMatrixSet_ref;
      }  UploadDifferentialExpressionOutput;
 
     /**  Uploads the differential expression  **/
