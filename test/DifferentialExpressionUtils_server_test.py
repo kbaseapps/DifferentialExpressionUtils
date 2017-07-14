@@ -3,10 +3,6 @@ import unittest
 import os  # noqa: F401
 import json  # noqa: F401
 import time
-from datetime import datetime
-from distutils.dir_util import copy_tree
-import requests
-import inspect
 import shutil
 
 from os import environ
@@ -82,7 +78,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
 
     @classmethod
     def setupTestData(cls):
-        '''
+
         genbank_file_name = 'minimal.gbff'
         genbank_file_path = os.path.join(cls.scratch, genbank_file_name)
         shutil.copy(os.path.join('data', genbank_file_name), genbank_file_path)
@@ -92,45 +88,36 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                                     'workspace_name': cls.wsName,
                                                     'genome_name': genome_object_name
                                                     })['genome_ref']
-        '''
-        cls.narrative_genome_ref = '23837/2/1'
+
+        #cls.narrative_genome_ref = '23837/2/1'
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
 
-    @unittest.skip("skipped test_upload_cuffdiff_differentialExpression")
+    #@unittest.skip("skipped test_upload_cuffdiff_differentialExpression")
     def test_upload_cuffdiff_differentialExpression(self):
 
         params = {
                   'destination_ref': self.getWsName() + '/test_cuffdiff_diffexp',
-                  'genome_ref': self.narrative_genome_ref,
+                  'genome_ref': self.genome_ref,
                   'tool_used': 'cuffdiff',
                   'tool_version': '2.2.1',
-                  'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp_small.diff'
+                  'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp_inf_small.diff'
                   }
         retVal = self.getImpl().upload_differentialExpression(self.ctx, params)[0]
 
         obj = self.dfu.get_objects(
             {'object_refs': [retVal.get('diffExprMatrixSet_ref')]})['data'][0]
 
-        print("============ DIFFERENTIAL EXPRESSION MATRIX OUTPUT ==============")
+        print("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
         pprint(obj)
         print("==========================================================")
 
-        '''
-        self.assertEqual(obj['info'][2].startswith('KBaseRNASeq.RNASeqDifferentialExpression'), True)
-        d = obj['data']
-        self.assertEqual(d['genome_id'], inputObj['data']['genome_id'])
-        self.assertEqual(d['expressionSet_id'], self.narrative_expressionset_ref)
-        self.assertEqual(d['alignmentSet_id'], inputObj['data']['alignmentSet_id'])
-        self.assertEqual(d['sampleset_id'], inputObj['data']['sampleset_id'])
-        '''
-
-    @unittest.skip("skipped test_upload_deseq_differentialExpression")
+    #@unittest.skip("skipped test_upload_deseq_differentialExpression")
     def test_upload_deseq_differentialExpression(self):
 
         params = {
                   'destination_ref': self.getWsName() + '/test_deseq_diffexp',
-                  'genome_ref': self.narrative_genome_ref,
+                  'genome_ref': self.genome_ref,
                   'tool_used': 'deseq',
                   'tool_version': 'deseq_version',
                   'diffexpr_filepath': 'data/deseq_output/sig_genes_results_small.csv'
@@ -149,7 +136,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
 
         params = {
                   'destination_ref': self.getWsName() + '/test_ballgown_diffexp',
-                  'genome_ref': self.narrative_genome_ref,
+                  'genome_ref': self.genome_ref,
                   'tool_used': 'ballgown',
                   'tool_version': 'ballgown_version',
                   'diffexpr_filepath': 'data/ballgown_output/ballgown_diffexp_small.tsv'
@@ -266,8 +253,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                     'diffexpr_filename': 'gene_exp.diff'
                                   },
                                   'No workspace with name 1s exists')
-    '''
-    '''
+    
     def test_upload_fail_non_expset_ref(self):
         self.fail_upload_diffexpr({
                                     'destination_ref': self.getWsName() + '/test_diffexpr',
