@@ -117,42 +117,6 @@ class DifferentialExpressionUtils:
             raise
         return info
 
-    def _get_diffexpr_data(self, expressionset_ref):
-        """
-        Get data from expressionset object required to create
-        differential expression object
-        """
-        expression_set = self.ws_client.get_objects2(
-                            {'objects': [{'ref': expressionset_ref}]})['data'][0]
-
-        if not expression_set.get('info')[2].startswith('KBaseRNASeq.RNASeqExpressionSet'):
-            raise TypeError('"{}" should be of type KBaseRNASeq.RNASeqExpressionSet'
-                            .format(self.PARAM_IN_EXPR_SET_REF))
-
-        expression_set_data = expression_set['data']
-
-        diffexpr_data = {}
-        diffexpr_data['expressionSet_id'] = expressionset_ref
-        diffexpr_data['alignmentSet_id'] = expression_set_data.get('alignmentSet_id')
-        diffexpr_data['sampleset_id'] = expression_set_data.get('sampleset_id')
-        diffexpr_data['genome_id'] = expression_set_data.get('genome_id')
-
-        condition = []
-
-        mapped_expr_ids = expression_set_data.get('mapped_expression_ids')
-
-        for i in mapped_expr_ids:
-            for alignment_id, expression_id in i.items():
-                expression_data = self.ws_client.get_objects2(
-                        {'objects':
-                         [{'ref': expression_id}]})['data'][0]['data']
-                expression_condition = expression_data.get('condition')
-                if expression_condition not in condition:
-                    condition.append(expression_condition)
-
-        diffexpr_data.update({'condition': condition})
-        return diffexpr_data
-
     #END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't
