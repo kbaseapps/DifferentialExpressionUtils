@@ -1,6 +1,7 @@
 import os
 import csv
 import uuid
+import errno
 from pprint import pprint
 from datetime import datetime
 from collections import namedtuple
@@ -88,13 +89,10 @@ class GenDiffExprMatrix:
                 # print 'FC_VAL: ', log2fc_val
                 if '-inf' in str(log2fc_val):
                     row['log2_fold_change'] = -float(max_value)
-                    #print 'LINE: ------ ', row
                 elif 'inf' in str(log2fc_val):
                     row['log2_fold_change'] = float(max_value)
-                    #print 'LINE: ++++++  ', row
                 elif 'nan' in str(log2fc_val):
                     row['log2_fold_change'] = None
-                    #print 'LINE: nnnnnn  ', row
 
                 try:
                     values.append([float(row[v]) for v in self.new_col_names[1:]])
@@ -107,9 +105,6 @@ class GenDiffExprMatrix:
                    'col_ids': col_names,
                    'values': values
                    }
-        #print '+++++++++++++++++++++++++'
-        #pprint(tmatrix)
-        #print '+++++++++++++++++++++++++'
 
         return tmatrix
 
@@ -185,7 +180,6 @@ class GenDiffExprMatrix:
                         'items': set_items
                      }
         return self.save_diff_expr_matrix_set(self.params.get('obj_name'), matrix_set)
-
 
     def process_cuffdiff_file(self, diffexpr_filepath):
 
