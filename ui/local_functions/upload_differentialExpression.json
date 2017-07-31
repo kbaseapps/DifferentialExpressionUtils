@@ -1,0 +1,16 @@
+{
+    "name" : "Upload Differential Expression",
+    "short_description" : "Uploads Differential Expression data to KBase",
+    "long_description" : "Uploads Differential Expression data to the KBase data stores",
+    "tags" : {
+        "categories" : ["upload"],
+        "input": {
+            "file_types": [],
+            "kb_types": []
+        },
+        "output": {
+            "file_types": [],
+            "kb_types": ["KBaseFeatureValues.DifferentialExpressionMatrix", "KBaseSets.DifferentialExpressionMatrixSet"]
+        }
+    }
+}
