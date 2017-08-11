@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import unittest
 import os  # noqa: F401
-import json  # noqa: F401
 import time
 import shutil
+import inspect
 
 from os import environ
 try:
@@ -89,8 +89,6 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                                     'genome_name': genome_object_name
                                                     })['genome_ref']
 
-        #cls.narrative_genome_ref = '23837/2/1'
-
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
 
     #@unittest.skip("skipped test_upload_cuffdiff_differentialExpression")
@@ -110,7 +108,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
 
         print("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
         pprint(obj)
-        print("==========================================================")
+        print("=====================================================================")
 
     #@unittest.skip("skipped test_upload_deseq_differentialExpression")
     def test_upload_deseq_differentialExpression(self):
@@ -127,9 +125,9 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         obj = self.dfu.get_objects(
             {'object_refs': [retVal.get('diffExprMatrixSet_ref')]})['data'][0]
 
-        print("============ DIFFERENTIAL EXPRESSION MATRIX OUTPUT ==============")
+        print("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
         pprint(obj)
-        print("==========================================================")
+        print("=====================================================================")
 
     #@unittest.skip("skipped test_upload_ballgown_differentialExpression")
     def test_upload_ballgown_differentialExpression(self):
@@ -149,15 +147,15 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         obj = self.dfu.get_objects(
             {'object_refs': [retVal.get('diffExprMatrixSet_ref')]})['data'][0]
 
-        print("============ DIFFERENTIAL EXPRESSION MATRIX OUTPUT ==============")
+        print("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
         pprint(obj)
-        print("==========================================================")
+        print("=====================================================================")
 
-    '''  
     def fail_upload_diffexpr(self, params, error, exception=ValueError, do_startswith=False):
 
         test_name = inspect.stack()[1][3]
-        print('\n*** starting expected upload fail test: ' + test_name + ' **')
+        print('\n******** starting expected upload fail test: ' + test_name + ' *********')
+        print('-------------------------------------------------------------------------------------')
 
         with self.assertRaises(exception) as context:
             self.getImpl().upload_differentialExpression(self.ctx, params)
@@ -171,100 +169,105 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
 
     def test_upload_fail_no_dst_ref(self):
         self.fail_upload_diffexpr({
-                                    'source_dir': self.upload_cuffdiff2_dir_path,
-                                    'expressionset_ref': self.narrative_expressionset_ref,
+                                    'genome_ref': self.genome_ref,
                                     'tool_used': 'cuffdiff',
                                     'tool_version': '2.2.1',
-                                    'diffexpr_filename': 'gene_exp.diff'
+                                    'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
                                   },
                                   'destination_ref parameter is required')
 
     def test_upload_fail_no_ws_name(self):
         self.fail_upload_diffexpr({
                                     'destination_ref': '/foo',
-                                    'source_dir': self.upload_cuffdiff2_dir_path,
-                                    'expressionset_ref': self.narrative_expressionset_ref,
+                                    'genome_ref': self.genome_ref,
                                     'tool_used': 'cuffdiff',
                                     'tool_version': '2.2.1',
-                                    'diffexpr_filename': 'gene_exp.diff'
+                                    'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
                                    },
                                    'Workspace name or id is required in destination_ref')
 
     def test_upload_fail_no_obj_name(self):
         self.fail_upload_diffexpr({
                                     'destination_ref': self.getWsName() + '/',
-                                    'source_dir': self.upload_cuffdiff2_dir_path,
-                                    'expressionset_ref': self.narrative_expressionset_ref,
+                                    'genome_ref': self.genome_ref,
                                     'tool_used': 'cuffdiff',
                                     'tool_version': '2.2.1',
-                                    'diffexpr_filename': 'gene_exp.diff'
+                                    'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
                                    },
                                    'Object name or id is required in destination_ref')
-
-    def test_upload_fail_no_src_dir(self):
-        self.fail_upload_diffexpr({
-                                    'destination_ref': self.getWsName() + '/test_diffexpr',
-                                    'expressionset_ref': self.narrative_expressionset_ref,
-                                    'tool_used': 'cuffdiff',
-                                    'tool_version': '2.2.1',
-                                    'diffexpr_filename': 'gene_exp.diff'
-                                  },
-                                  'source_dir parameter is required')
-
-    def test_upload_fail_non_existant_src_dir(self):
-        self.fail_upload_diffexpr({
-                                    'destination_ref': self.getWsName() + '/test_diffexpr',
-                                    'source_dir': 'foo',
-                                    'expressionset_ref': self.narrative_expressionset_ref,
-                                    'tool_used': 'cuffdiff',
-                                    'tool_version': '2.2.1',
-                                    'diffexpr_filename': 'gene_exp.diff'
-                                  },
-                                  'Source directory does not exist: foo')
-
-    def test_upload_fail_no_diffexpr_filename(self):
-        self.fail_upload_diffexpr({
-                                    'destination_ref': self.getWsName() + '/test_diffexpr',
-                                    'source_dir': self.upload_cuffdiff2_dir_path,
-                                    'expressionset_ref': self.narrative_expressionset_ref,
-                                    'tool_used': 'cuffdiff',
-                                    'tool_version': '2.2.1'
-                                  },
-                                  'diffexpr_filename parameter is required')
 
     def test_upload_fail_bad_wsname(self):
         self.fail_upload_diffexpr({
                                     'destination_ref': '&bad' + '/foo',
-                                    'source_dir': 'foo',
-                                    'expressionset_ref': self.narrative_expressionset_ref,
+                                    'genome_ref': self.genome_ref,
                                     'tool_used': 'cuffdiff',
                                     'tool_version': '2.2.1',
-                                    'diffexpr_filename': 'gene_exp.diff'
+                                    'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
                                   },
                                   'Illegal character in workspace name &bad: &')
 
     def test_upload_fail_non_existant_wsname(self):
         self.fail_upload_diffexpr({
                                     'destination_ref': '1s' + '/foo',
-                                    'source_dir': 'foo',
-                                    'expressionset_ref': self.narrative_expressionset_ref,
+                                    'genome_ref': self.genome_ref,
                                     'tool_used': 'cuffdiff',
                                     'tool_version': '2.2.1',
-                                    'diffexpr_filename': 'gene_exp.diff'
+                                    'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
                                   },
                                   'No workspace with name 1s exists')
-    
-    def test_upload_fail_non_expset_ref(self):
+
+    def test_upload_fail_no_diffexpr_filepath(self):
         self.fail_upload_diffexpr({
                                     'destination_ref': self.getWsName() + '/test_diffexpr',
-                                    'source_dir': self.upload_cuffdiff2_dir_path,
-                                    'expressionset_ref': self.genome_ref,
+                                    'genome_ref': self.genome_ref,
+                                    'tool_used': 'cuffdiff',
+                                    'tool_version': '2.2.1'
+                                    },
+                                    'diffexpr_filepath parameter is required')
+
+    def test_upload_fail_non_existant_filepath(self):
+        self.fail_upload_diffexpr({
+                                    'destination_ref': self.getWsName() + '/test_diffexpr',
+                                    'genome_ref': self.genome_ref,
                                     'tool_used': 'cuffdiff',
                                     'tool_version': '2.2.1',
-                                    'diffexpr_filename': 'gene_exp.diff'
+                                    'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp__.diff'
                                   },
-            '"expressionset_ref" should be of type KBaseRNASeq.RNASeqExpressionSet',
-            exception=TypeError)
-    '''
+                                  'File data/cuffdiff_output_3conditions/gene_exp__.diff does not exist: ')
 
+    def test_upload_fail_no_genome_ref(self):
+        self.fail_upload_diffexpr({
+                                    'destination_ref': self.getWsName() + '/test_diffexpr',
+                                    'tool_used': 'cuffdiff',
+                                    'tool_version': '2.2.1',
+                                    'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
+                                    },
+                                    'genome_ref parameter is required')
 
+    def test_upload_fail_no_tool_used(self):
+        self.fail_upload_diffexpr({
+                                    'destination_ref': self.getWsName() + '/test_diffexpr',
+                                    'genome_ref': self.genome_ref,
+                                    'tool_version': '2.2.1',
+                                    'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
+                                    },
+                                    'tool_used parameter is required')
+
+    def test_upload_fail_invalid_tool_used(self):
+        self.fail_upload_diffexpr({
+                                    'destination_ref': self.getWsName() + '/test_diffexpr',
+                                    'genome_ref': self.genome_ref,
+                                    'tool_used': 'cufflinks',
+                                    'tool_version': '2.2.1',
+                                    'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
+                                    },
+                                    '"cufflinks" is not a valid tool_used parameter')
+
+    def test_upload_fail_no_tool_version(self):
+        self.fail_upload_diffexpr({
+                                    'destination_ref': self.getWsName() + '/test_diffexpr',
+                                    'genome_ref': self.genome_ref,
+                                    'tool_used': 'cuffdiff',
+                                    'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
+                                    },
+                                    'tool_version parameter is required')
