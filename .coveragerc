@@ -1,0 +1,10 @@
+[run]
+include =
+    lib/DifferentialExpressionUtils/*
+    /kb/module/lib/DifferentialExpressionUtils/*
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
