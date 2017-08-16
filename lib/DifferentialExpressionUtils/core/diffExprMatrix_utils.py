@@ -61,6 +61,7 @@ class GenDiffExprMatrix:
                                 values_list.append(None)
                             else:
                                 tmpval = tmpval.replace("'", "")
+                                tmpval = tmpval.replace('"', '')
                                 values_list.append(float(tmpval))
                         else:
                             raise ValueError("invalid type in input file: {}".format(tmpval))
