@@ -51,13 +51,27 @@ class GenDiffExprMatrix:
                 try:
                     values.append([float(row[v]) for v in old_col_names[1:]])
                 except:
-                    values.append([float(row[old_col_names[1]]), None, None])
+                    values_list = []
+                    for v in old_col_names[1:]:
+                        tmpval = row[v]
+                        if isinstance(tmpval, (int, long, float)):
+                            values_list.append(float(tmpval))
+                        elif isinstance(tmpval, basestring):
+                            if 'na' in tmpval.lower():
+                                values_list.append(None)
+                            else:
+                                tmpval = tmpval.replace("'", "")
+                                values_list.append(float(tmpval))
+                        else:
+                            raise ValueError("invalid type in input file: {}".format(tmpval))
+                    values.append(values_list)
                 row_names.append(row[old_col_names[0]])
 
         twoD_matrix = { 'row_ids': row_names,
                         'col_ids': col_names,
                         'values': values
                         }
+
         return twoD_matrix
 
     def get_max_fold_change_to_handle_inf(self, infile):
