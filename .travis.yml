@@ -15,23 +15,22 @@ notifications:
     on_success: never
     on_failure: always
 
-#TEST_TOKEN
 env:
   global:
-    secure: RYeC6x18AkROECBMidvYBh6OtM4vwNRuxYect/J1XRKGZcF54RG/EDql1N12dmTAxHSpmPwqsK5XNwaS/ngqIFqaK+iVvBIikgLv6oV8pCb8izdXMgd/Gb68/E384MdzJcdDllx5tcTOLAoxN58PkWgzkndJ5FxHVAucwPxsCAVCmtD/Ism9dTzKhHI7FUw7cwZ85e9rEwI4l0Lroqf+q+Dki1RJGbtTV1WOfRaEkOuGzNY6rkrm7pZ9X65xdMFs3oVyPtabEa+phgDtZB7hJ4LycSKYqWMlx6CUTfzMrFQ7LRXwYOQAEVrHnz8UZa99Oyrohu8jGbdh33xCyounbIIQcAjzsYssS9NEbBKdfz2qRyV1h6hdUNaiXLzsgoM0EsNbJVLSzBOzTRR/nTcR/X67nqWDl8c2kqNBnTe3ziUkcC8vytIkS2Y3U66OXDMT5rjTFW9cyo07qOtdQJvDuSGh+bC+PgjyT7LQIOD1f52qOHURqnnpdsxBLyBtf1GMBSyu+8ojHKSVDzzt4dE62V5ucxCl+xAYOMhasaEgogarz1zb4JbiuG0PaHsYcUJFv3FOhvHjPccDDv8OuzstZWPEjElhywqd9cLT+b/EBgkvHNwIDwWasrc1kAlVzERM6Wvwd8OcgZZLefCWUFC7zbUJsJ+AcoyY8gkbV7ROIzA=
+    secure: pEPe0vGXbqrF+uFCu4j5iyqNP0eMaOyClyNbDAM2NBJIoBUSVThhE6P2dZa6ueOPfr7B4DemJcOWUvvtMKRQR+rqbmZdqYZu62N3rsRp5axJW6j/hoTNEUIeG2Tlc3abL00XKF7hVmatrZ0ucgrs1JKnJLnv+CHSon6uuRAr5b4H0a86A2tY88Kjsfy2nOqQucS8s9VwBvo6p/PYkwFN2RUl4F2gOx2Y8LQQ5hKq0VfpIf6rxyd5uNGwnRZrol4DzRmYW1y6y8qc9nQd9tp+ioRrE5d3pR4zF08gkGv+IxvzgsOAE4Jwlcnv5QI8fHUsP7eI6DiyiEGQlYh9VNMEQNYyDYvEg/dxcc+x5B/V1uqvSdMHCZRdLNzdyrJ2fG9VtFn6uXhgYLxrnKfibkV2WIt4WkVbWvkEdo6etgeQMG9RGYCohQuj8BN7HzlCpo5zDuwR6HpDI0zps12m1wyXSqm7hqxuxBYB3bW0G48lz66jNM3KVrGKucD1z62TP5jvH9ZLBhByIY3hn4MToQ6qjKva70srut+XofjFK95A9fwWn57Yyht9uiI9Rpha9w1EBAu/dpwzJduBcARaQy4FgcSkjvqQJl1b+wYkRlWfq71Z5waBH8Sy7lR0vef8O1nimhTwab5rXi900G9tY/YwtAgzCOikwJ1xSwoI3TVi0b8=
 
 branches:
   only:
   - master
-  - develop
 
 before_install:
 - docker version
 - python --version
+- javac -version
+- java -version
 
 install:
 - pip install coveralls
-- pip install coverage
 - git clone https://github.com/kbase/jars
 - git clone https://github.com/kbase/kb_sdk
 - cd kb_sdk
@@ -40,16 +39,19 @@ install:
 - docker images
 - export PATH=$(pwd)/bin:$PATH
 - cd ../
-- git clone https://github.com/kbaseapps/DifferentialExpressionUtils.git
+- git clone https://github.com/ugswork/DifferentialExpressionUtils.git
 - cd DifferentialExpressionUtils
-- kb-sdk test -s || true
+- kb-sdk test || true
 - sed -i "s/test_token=/test_token=$TEST_TOKEN/" test_local/test.cfg
 - sed -i 's\https://appdev.kbase.us/services\https://ci.kbase.us/services\' test_local/test.cfg
-- sed -i 's\https://appdev.kbase.us/services/auth/api/legacy/KBase/Sessions/Login\https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login\' test_local/test.cfg
+- sed -i 's\https://appdev.kbase.us/services/auth/api/legacy/KBase/Sessions/Login\https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login\'
+  test_local/test.cfg
 - sed -i 's/$(id -u)/0:0/' test_local/run_tests.sh
 - pwd=$(pwd)
 - echo "#!/bin/bash" >> test_local/run_subjob.sh
-- echo -e "$pwd/test_local/run_docker.sh run --rm --user 0:0 -v $pwd/test_local/subjobs/\$1/workdir:/kb/module/work -v $pwd/test_local/workdir/tmp:/kb/module/work/tmp \$4 -e \"SDK_CALLBACK_URL=\$3\" \$2 async" >> test_local/run_subjob.sh
+- echo -e "$pwd/test_local/run_docker.sh run --rm --user 0:0 -v $pwd/test_local/subjobs/\$1/workdir:/kb/module/work
+  -v $pwd/test_local/workdir/tmp:/kb/module/work/tmp \$4 -e \"SDK_CALLBACK_URL=\$3\"
+  \$2 async" >> test_local/run_subjob.sh
 - cat test_local/run_subjob.sh
 
 script:
@@ -64,4 +66,3 @@ after_success:
 - cat .coverage
 - coverage report -m
 - coveralls
-

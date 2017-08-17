@@ -1,10 +1,22 @@
 [run]
-include =
-    lib/DifferentialExpressionUtils/*
-    /kb/module/lib/DifferentialExpressionUtils/*
+branch = True
+
+omit =
+    /kb/module/lib/DifferentialExpressionUtils/authclient.py
+    /kb/module/lib/DifferentialExpressionUtils/baseclient.py
+    /kb/module/lib/DifferentialExpressionUtils/DifferentialExpressionUtilsClient.py
+    /kb/module/lib/DifferentialExpressionUtils/DifferentialExpressionUtilsServer.py
+source = /kb/module/lib/DifferentialExpressionUtils
+
 
 [report]
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Have to re-enable the standard pragma
     pragma: no cover
+    # Don't complain if tests don't hit defensive assertion code:
+    raise NotImplementedError
+
+show_missing = 1
+
+
