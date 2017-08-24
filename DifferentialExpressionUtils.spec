@@ -59,7 +59,7 @@ module DifferentialExpressionUtils {
                                    authentication required;
 
     /* --------------------------------------------------------------------------------- */
-    
+
     typedef structure {
         mapping<string,string>  condition_mapping;     /* {'condition1': 'condition2'} */
         string                  diffexpr_filepath;     /*  The input file given is expected to have the columns

@@ -237,6 +237,7 @@ SaveDiffExprMatrixSetParams is a reference to a hash where the following keys ar
 DiffExprFile is a reference to a hash where the following keys are defined:
 	condition_mapping has a value which is a reference to a hash where the key is a string and the value is a string
 	diffexpr_filepath has a value which is a string
+	delimiter has a value which is a string
 SaveDiffExprMatrixSetOutput is a reference to a hash where the following keys are defined:
 	diffExprMatrixSet_ref has a value which is a string
 
@@ -260,6 +261,7 @@ SaveDiffExprMatrixSetParams is a reference to a hash where the following keys ar
 DiffExprFile is a reference to a hash where the following keys are defined:
 	condition_mapping has a value which is a reference to a hash where the key is a string and the value is a string
 	diffexpr_filepath has a value which is a string
+	delimiter has a value which is a string
 SaveDiffExprMatrixSetOutput is a reference to a hash where the following keys are defined:
 	diffExprMatrixSet_ref has a value which is a string
 
@@ -724,6 +726,11 @@ diffExprMatrixSet_ref has a value which is a string
 
 
 
+=item Description
+
+---------------------------------------------------------------------------------
+
+
 =item Definition
 
 =begin html
@@ -732,6 +739,7 @@ diffExprMatrixSet_ref has a value which is a string
 a reference to a hash where the following keys are defined:
 condition_mapping has a value which is a reference to a hash where the key is a string and the value is a string
 diffexpr_filepath has a value which is a string
+delimiter has a value which is a string
 
 </pre>
 
@@ -742,6 +750,7 @@ diffexpr_filepath has a value which is a string
 a reference to a hash where the following keys are defined:
 condition_mapping has a value which is a reference to a hash where the key is a string and the value is a string
 diffexpr_filepath has a value which is a string
+delimiter has a value which is a string
 
 
 =end text

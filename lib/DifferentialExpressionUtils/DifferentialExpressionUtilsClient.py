@@ -75,12 +75,14 @@ class DifferentialExpressionUtils(object):
            version of the tool used string   genome_ref              - 
            genome object reference *) -> structure: parameter
            "destination_ref" of String, parameter "diffexpr_data" of list of
-           type "DiffExprFile" -> structure: parameter "condition_mapping" of
+           type "DiffExprFile"
+           (------------------------------------------------------------------
+           ---------------) -> structure: parameter "condition_mapping" of
            mapping from String to String, parameter "diffexpr_filepath" of
-           String, parameter "tool_used" of String, parameter "tool_version"
-           of String, parameter "genome_ref" of String, parameter
-           "description" of String, parameter "type" of String, parameter
-           "scale" of String
+           String, parameter "delimiter" of String, parameter "tool_used" of
+           String, parameter "tool_version" of String, parameter "genome_ref"
+           of String, parameter "description" of String, parameter "type" of
+           String, parameter "scale" of String
         :returns: instance of type "SaveDiffExprMatrixSetOutput" (*    
            Output from upload differential expression    *) -> structure:
            parameter "diffExprMatrixSet_ref" of String

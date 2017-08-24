@@ -33,7 +33,7 @@ class DifferentialExpressionUtils:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/ugswork/DifferentialExpressionUtils.git"
-    GIT_COMMIT_HASH = "a5145c311a61f25d3c4e5f48c00af9a308a6c24f"
+    GIT_COMMIT_HASH = "a014d560cccad553833b7ed343224759f2b2bda4"
 
     #BEGIN_CLASS_HEADER
 
@@ -225,12 +225,14 @@ class DifferentialExpressionUtils:
            version of the tool used string   genome_ref              - 
            genome object reference *) -> structure: parameter
            "destination_ref" of String, parameter "diffexpr_data" of list of
-           type "DiffExprFile" -> structure: parameter "condition_mapping" of
+           type "DiffExprFile"
+           (------------------------------------------------------------------
+           ---------------) -> structure: parameter "condition_mapping" of
            mapping from String to String, parameter "diffexpr_filepath" of
-           String, parameter "tool_used" of String, parameter "tool_version"
-           of String, parameter "genome_ref" of String, parameter
-           "description" of String, parameter "type" of String, parameter
-           "scale" of String
+           String, parameter "delimiter" of String, parameter "tool_used" of
+           String, parameter "tool_version" of String, parameter "genome_ref"
+           of String, parameter "description" of String, parameter "type" of
+           String, parameter "scale" of String
         :returns: instance of type "SaveDiffExprMatrixSetOutput" (*    
            Output from upload differential expression    *) -> structure:
            parameter "diffExprMatrixSet_ref" of String

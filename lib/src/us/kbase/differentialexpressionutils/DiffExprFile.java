@@ -13,14 +13,17 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * <p>Original spec-file type: DiffExprFile</p>
- * 
+ * <pre>
+ * ---------------------------------------------------------------------------------
+ * </pre>
  * 
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
     "condition_mapping",
-    "diffexpr_filepath"
+    "diffexpr_filepath",
+    "delimiter"
 })
 public class DiffExprFile {
 
@@ -28,6 +31,8 @@ public class DiffExprFile {
     private Map<String, String> conditionMapping;
     @JsonProperty("diffexpr_filepath")
     private java.lang.String diffexprFilepath;
+    @JsonProperty("delimiter")
+    private java.lang.String delimiter;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
     @JsonProperty("condition_mapping")
@@ -60,6 +65,21 @@ public class DiffExprFile {
         return this;
     }
 
+    @JsonProperty("delimiter")
+    public java.lang.String getDelimiter() {
+        return delimiter;
+    }
+
+    @JsonProperty("delimiter")
+    public void setDelimiter(java.lang.String delimiter) {
+        this.delimiter = delimiter;
+    }
+
+    public DiffExprFile withDelimiter(java.lang.String delimiter) {
+        this.delimiter = delimiter;
+        return this;
+    }
+
     @JsonAnyGetter
     public Map<java.lang.String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -72,7 +92,7 @@ public class DiffExprFile {
 
     @Override
     public java.lang.String toString() {
-        return ((((((("DiffExprFile"+" [conditionMapping=")+ conditionMapping)+", diffexprFilepath=")+ diffexprFilepath)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((("DiffExprFile"+" [conditionMapping=")+ conditionMapping)+", diffexprFilepath=")+ diffexprFilepath)+", delimiter=")+ delimiter)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }
