@@ -72,12 +72,10 @@ class DifferentialExpressionUtils:
         if not bool(obj_name_id.strip()):
             raise ValueError("Object name or id is required in " + self.PARAM_IN_DST_REF)
 
-        dfu = DataFileUtil(self.callback_url)
-
         if not isinstance(ws_name, int):
 
             try:
-                ws_id = dfu.ws_name_to_id(ws_name)
+                ws_id = self.dfu.ws_name_to_id(ws_name)
             except DFUError as se:
                 prefix = se.message.split('.')[0]
                 raise ValueError(prefix)

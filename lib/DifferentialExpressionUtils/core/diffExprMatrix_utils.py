@@ -7,6 +7,8 @@ from datetime import datetime
 from collections import namedtuple
 
 from Workspace.WorkspaceClient import Workspace as Workspace
+from DataFileUtil.DataFileUtilClient import DataFileUtil
+from DataFileUtil.baseclient import ServerError as DFUError
 from KBaseFeatureValues.KBaseFeatureValuesClient import KBaseFeatureValues
 from SetAPI.SetAPIClient import SetAPI
 
@@ -20,6 +22,7 @@ class GenDiffExprMatrix:
         self.ws_url = config['workspace-url']
         self.ws_client = Workspace(self.ws_url)
         self.fv = KBaseFeatureValues(self.callback_url)
+        self.dfu = DataFileUtil(self.callback_url)
         self.setAPI = SetAPI(self.callback_url)
         self._mkdir_p(self.scratch)
 
@@ -132,11 +135,12 @@ class GenDiffExprMatrix:
                     'type': 'log2_level',
                     'scale': '1.0'
                     }
-        res = self.ws_client.save_objects({'id': self.params.get('ws_id'),
+        res = self.dfu.save_objects({'id': self.params.get('ws_id'),
                                            "objects": [{
                                                "type": "KBaseFeatureValues.DifferentialExpressionMatrix",
                                                "data": dem_data,
-                                               "name": obj_name
+                                               "name": obj_name,
+                                               "extra_provenance_input_refs": [self.params.get('genome_ref')]
                                            }]
                                            })[0]
         ret_ref = str(res[6]) + '/' + str(res[0]) + '/' + str(res[4])
