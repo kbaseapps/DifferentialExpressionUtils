@@ -168,7 +168,7 @@ public class DifferentialExpressionUtilsClient {
      * *  Uploads the differential expression  *
      * </pre>
      * @param   params   instance of type {@link us.kbase.differentialexpressionutils.UploadDifferentialExpressionParams UploadDifferentialExpressionParams}
-     * @return   instance of type {@link us.kbase.differentialexpressionutils.UploadDifferentialExpressionOutput UploadDifferentialExpressionOutput}
+     * @return   parameter "output" of type {@link us.kbase.differentialexpressionutils.UploadDifferentialExpressionOutput UploadDifferentialExpressionOutput}
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */
@@ -177,6 +177,24 @@ public class DifferentialExpressionUtilsClient {
         args.add(params);
         TypeReference<List<UploadDifferentialExpressionOutput>> retType = new TypeReference<List<UploadDifferentialExpressionOutput>>() {};
         List<UploadDifferentialExpressionOutput> res = caller.jsonrpcCall("DifferentialExpressionUtils.upload_differentialExpression", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: save_differential_expression_matrix_set</p>
+     * <pre>
+     * *  Uploads the differential expression  *
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.differentialexpressionutils.SaveDiffExprMatrixSetParams SaveDiffExprMatrixSetParams}
+     * @return   instance of type {@link us.kbase.differentialexpressionutils.SaveDiffExprMatrixSetOutput SaveDiffExprMatrixSetOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public SaveDiffExprMatrixSetOutput saveDifferentialExpressionMatrixSet(SaveDiffExprMatrixSetParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<SaveDiffExprMatrixSetOutput>> retType = new TypeReference<List<SaveDiffExprMatrixSetOutput>>() {};
+        List<SaveDiffExprMatrixSetOutput> res = caller.jsonrpcCall("DifferentialExpressionUtils.save_differential_expression_matrix_set", args, retType, true, true, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 

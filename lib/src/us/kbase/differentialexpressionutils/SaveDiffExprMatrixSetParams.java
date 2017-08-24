@@ -2,6 +2,7 @@
 package us.kbase.differentialexpressionutils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -12,18 +13,17 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 
 /**
- * <p>Original spec-file type: UploadDifferentialExpressionParams</p>
+ * <p>Original spec-file type: SaveDiffExprMatrixSetParams</p>
  * <pre>
- * *    Required input parameters for uploading Differential expression data
- *         string   destination_ref        -   object reference of Differential expression data.
+ * *    Required input parameters for saving Differential expression data
+ *         string   destination_ref         -  object reference of Differential expression data.
  *                                             The object ref is 'ws_name_or_id/obj_name_or_id'
  *                                             where ws_name_or_id is the workspace name or id
  *                                             and obj_name_or_id is the object name or id
- *         string   diffexpr_filepath      -   file path of the differential expression data file
- *                                             created by cuffdiff, deseq or ballgown
- *         string   tool_used              -   cufflinks, ballgown or deseq
- *         string   tool_version           -   version of the tool used
- *         string   genome_ref             -   genome object reference
+ *         list<DiffExprFile> diffexpr_data -  list of DiffExprFiles (condition pair & file)
+ *         string   tool_used               -  cufflinks, ballgown or deseq
+ *         string   tool_version            -  version of the tool used
+ *         string   genome_ref              -  genome object reference
  *     *
  * </pre>
  * 
@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
     "destination_ref",
-    "diffexpr_filepath",
+    "diffexpr_data",
     "tool_used",
     "tool_version",
     "genome_ref",
@@ -40,12 +40,12 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "type",
     "scale"
 })
-public class UploadDifferentialExpressionParams {
+public class SaveDiffExprMatrixSetParams {
 
     @JsonProperty("destination_ref")
     private String destinationRef;
-    @JsonProperty("diffexpr_filepath")
-    private String diffexprFilepath;
+    @JsonProperty("diffexpr_data")
+    private List<DiffExprFile> diffexprData;
     @JsonProperty("tool_used")
     private String toolUsed;
     @JsonProperty("tool_version")
@@ -70,23 +70,23 @@ public class UploadDifferentialExpressionParams {
         this.destinationRef = destinationRef;
     }
 
-    public UploadDifferentialExpressionParams withDestinationRef(String destinationRef) {
+    public SaveDiffExprMatrixSetParams withDestinationRef(String destinationRef) {
         this.destinationRef = destinationRef;
         return this;
     }
 
-    @JsonProperty("diffexpr_filepath")
-    public String getDiffexprFilepath() {
-        return diffexprFilepath;
+    @JsonProperty("diffexpr_data")
+    public List<DiffExprFile> getDiffexprData() {
+        return diffexprData;
     }
 
-    @JsonProperty("diffexpr_filepath")
-    public void setDiffexprFilepath(String diffexprFilepath) {
-        this.diffexprFilepath = diffexprFilepath;
+    @JsonProperty("diffexpr_data")
+    public void setDiffexprData(List<DiffExprFile> diffexprData) {
+        this.diffexprData = diffexprData;
     }
 
-    public UploadDifferentialExpressionParams withDiffexprFilepath(String diffexprFilepath) {
-        this.diffexprFilepath = diffexprFilepath;
+    public SaveDiffExprMatrixSetParams withDiffexprData(List<DiffExprFile> diffexprData) {
+        this.diffexprData = diffexprData;
         return this;
     }
 
@@ -100,7 +100,7 @@ public class UploadDifferentialExpressionParams {
         this.toolUsed = toolUsed;
     }
 
-    public UploadDifferentialExpressionParams withToolUsed(String toolUsed) {
+    public SaveDiffExprMatrixSetParams withToolUsed(String toolUsed) {
         this.toolUsed = toolUsed;
         return this;
     }
@@ -115,7 +115,7 @@ public class UploadDifferentialExpressionParams {
         this.toolVersion = toolVersion;
     }
 
-    public UploadDifferentialExpressionParams withToolVersion(String toolVersion) {
+    public SaveDiffExprMatrixSetParams withToolVersion(String toolVersion) {
         this.toolVersion = toolVersion;
         return this;
     }
@@ -130,7 +130,7 @@ public class UploadDifferentialExpressionParams {
         this.genomeRef = genomeRef;
     }
 
-    public UploadDifferentialExpressionParams withGenomeRef(String genomeRef) {
+    public SaveDiffExprMatrixSetParams withGenomeRef(String genomeRef) {
         this.genomeRef = genomeRef;
         return this;
     }
@@ -145,7 +145,7 @@ public class UploadDifferentialExpressionParams {
         this.description = description;
     }
 
-    public UploadDifferentialExpressionParams withDescription(String description) {
+    public SaveDiffExprMatrixSetParams withDescription(String description) {
         this.description = description;
         return this;
     }
@@ -160,7 +160,7 @@ public class UploadDifferentialExpressionParams {
         this.type = type;
     }
 
-    public UploadDifferentialExpressionParams withType(String type) {
+    public SaveDiffExprMatrixSetParams withType(String type) {
         this.type = type;
         return this;
     }
@@ -175,7 +175,7 @@ public class UploadDifferentialExpressionParams {
         this.scale = scale;
     }
 
-    public UploadDifferentialExpressionParams withScale(String scale) {
+    public SaveDiffExprMatrixSetParams withScale(String scale) {
         this.scale = scale;
         return this;
     }
@@ -192,7 +192,7 @@ public class UploadDifferentialExpressionParams {
 
     @Override
     public String toString() {
-        return ((((((((((((((((((("UploadDifferentialExpressionParams"+" [destinationRef=")+ destinationRef)+", diffexprFilepath=")+ diffexprFilepath)+", toolUsed=")+ toolUsed)+", toolVersion=")+ toolVersion)+", genomeRef=")+ genomeRef)+", description=")+ description)+", type=")+ type)+", scale=")+ scale)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((("SaveDiffExprMatrixSetParams"+" [destinationRef=")+ destinationRef)+", diffexprData=")+ diffexprData)+", toolUsed=")+ toolUsed)+", toolVersion=")+ toolVersion)+", genomeRef=")+ genomeRef)+", description=")+ description)+", type=")+ type)+", scale=")+ scale)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

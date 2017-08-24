@@ -42,24 +42,51 @@ class DifferentialExpressionUtils(object):
            reference of Differential expression data. The object ref is
            'ws_name_or_id/obj_name_or_id' where ws_name_or_id is the
            workspace name or id and obj_name_or_id is the object name or id
-           string   source_dir             -   directory with the files to be
-           uploaded string   expressionset_ref      -   expressionset object
-           reference string   tool_used              -   cufflinks, ballgown
-           or deseq string   tool_version           -   version of the tool
-           used string   diffexpr_filename      -   name of the differential
-           expression data file in source_dir, created by cuffdiff, deseq or
-           ballgown *) -> structure: parameter "destination_ref" of String,
-           parameter "source_dir" of String, parameter "expressionset_ref" of
-           String, parameter "tool_used" of String, parameter "tool_version"
-           of String, parameter "diffexpr_filename" of String, parameter
-           "tool_opts" of mapping from String to String, parameter "comments"
-           of String
+           string   diffexpr_filepath      -   file path of the differential
+           expression data file created by cuffdiff, deseq or ballgown string
+           tool_used              -   cufflinks, ballgown or deseq string  
+           tool_version           -   version of the tool used string  
+           genome_ref             -   genome object reference *) ->
+           structure: parameter "destination_ref" of String, parameter
+           "diffexpr_filepath" of String, parameter "tool_used" of String,
+           parameter "tool_version" of String, parameter "genome_ref" of
+           String, parameter "description" of String, parameter "type" of
+           String, parameter "scale" of String
         :returns: instance of type "UploadDifferentialExpressionOutput" (*   
            Output from upload differential expression    *) -> structure:
-           parameter "obj_ref" of String
+           parameter "diffExprMatrixSet_ref" of String
         """
         return self._client.call_method(
             'DifferentialExpressionUtils.upload_differentialExpression',
+            [params], self._service_ver, context)
+
+    def save_differential_expression_matrix_set(self, params, context=None):
+        """
+        Uploads the differential expression  *
+        :param params: instance of type "SaveDiffExprMatrixSetParams" (*   
+           Required input parameters for saving Differential expression data
+           string   destination_ref         -  object reference of
+           Differential expression data. The object ref is
+           'ws_name_or_id/obj_name_or_id' where ws_name_or_id is the
+           workspace name or id and obj_name_or_id is the object name or id
+           list<DiffExprFile> diffexpr_data -  list of DiffExprFiles
+           (condition pair & file) string   tool_used               - 
+           cufflinks, ballgown or deseq string   tool_version            - 
+           version of the tool used string   genome_ref              - 
+           genome object reference *) -> structure: parameter
+           "destination_ref" of String, parameter "diffexpr_data" of list of
+           type "DiffExprFile" -> structure: parameter "condition_mapping" of
+           mapping from String to String, parameter "diffexpr_filepath" of
+           String, parameter "tool_used" of String, parameter "tool_version"
+           of String, parameter "genome_ref" of String, parameter
+           "description" of String, parameter "type" of String, parameter
+           "scale" of String
+        :returns: instance of type "SaveDiffExprMatrixSetOutput" (*    
+           Output from upload differential expression    *) -> structure:
+           parameter "diffExprMatrixSet_ref" of String
+        """
+        return self._client.call_method(
+            'DifferentialExpressionUtils.save_differential_expression_matrix_set',
             [params], self._service_ver, context)
 
     def download_differentialExpression(self, params, context=None):

@@ -110,7 +110,7 @@ sub new
 
 =head2 upload_differentialExpression
 
-  $return = $obj->upload_differentialExpression($params)
+  $output = $obj->upload_differentialExpression($params)
 
 =over 4
 
@@ -120,18 +120,18 @@ sub new
 
 <pre>
 $params is a DifferentialExpressionUtils.UploadDifferentialExpressionParams
-$return is a DifferentialExpressionUtils.UploadDifferentialExpressionOutput
+$output is a DifferentialExpressionUtils.UploadDifferentialExpressionOutput
 UploadDifferentialExpressionParams is a reference to a hash where the following keys are defined:
 	destination_ref has a value which is a string
-	source_dir has a value which is a string
-	expressionset_ref has a value which is a string
+	diffexpr_filepath has a value which is a string
 	tool_used has a value which is a string
 	tool_version has a value which is a string
-	diffexpr_filename has a value which is a string
-	tool_opts has a value which is a reference to a hash where the key is a string and the value is a string
-	comments has a value which is a string
+	genome_ref has a value which is a string
+	description has a value which is a string
+	type has a value which is a string
+	scale has a value which is a string
 UploadDifferentialExpressionOutput is a reference to a hash where the following keys are defined:
-	obj_ref has a value which is a string
+	diffExprMatrixSet_ref has a value which is a string
 
 </pre>
 
@@ -140,18 +140,18 @@ UploadDifferentialExpressionOutput is a reference to a hash where the following 
 =begin text
 
 $params is a DifferentialExpressionUtils.UploadDifferentialExpressionParams
-$return is a DifferentialExpressionUtils.UploadDifferentialExpressionOutput
+$output is a DifferentialExpressionUtils.UploadDifferentialExpressionOutput
 UploadDifferentialExpressionParams is a reference to a hash where the following keys are defined:
 	destination_ref has a value which is a string
-	source_dir has a value which is a string
-	expressionset_ref has a value which is a string
+	diffexpr_filepath has a value which is a string
 	tool_used has a value which is a string
 	tool_version has a value which is a string
-	diffexpr_filename has a value which is a string
-	tool_opts has a value which is a reference to a hash where the key is a string and the value is a string
-	comments has a value which is a string
+	genome_ref has a value which is a string
+	description has a value which is a string
+	type has a value which is a string
+	scale has a value which is a string
 UploadDifferentialExpressionOutput is a reference to a hash where the following keys are defined:
-	obj_ref has a value which is a string
+	diffExprMatrixSet_ref has a value which is a string
 
 
 =end text
@@ -206,6 +206,116 @@ Uploads the differential expression  *
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method upload_differentialExpression",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'upload_differentialExpression',
+				       );
+    }
+}
+ 
+
+
+=head2 save_differential_expression_matrix_set
+
+  $return = $obj->save_differential_expression_matrix_set($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a DifferentialExpressionUtils.SaveDiffExprMatrixSetParams
+$return is a DifferentialExpressionUtils.SaveDiffExprMatrixSetOutput
+SaveDiffExprMatrixSetParams is a reference to a hash where the following keys are defined:
+	destination_ref has a value which is a string
+	diffexpr_data has a value which is a reference to a list where each element is a DifferentialExpressionUtils.DiffExprFile
+	tool_used has a value which is a string
+	tool_version has a value which is a string
+	genome_ref has a value which is a string
+	description has a value which is a string
+	type has a value which is a string
+	scale has a value which is a string
+DiffExprFile is a reference to a hash where the following keys are defined:
+	condition_mapping has a value which is a reference to a hash where the key is a string and the value is a string
+	diffexpr_filepath has a value which is a string
+SaveDiffExprMatrixSetOutput is a reference to a hash where the following keys are defined:
+	diffExprMatrixSet_ref has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a DifferentialExpressionUtils.SaveDiffExprMatrixSetParams
+$return is a DifferentialExpressionUtils.SaveDiffExprMatrixSetOutput
+SaveDiffExprMatrixSetParams is a reference to a hash where the following keys are defined:
+	destination_ref has a value which is a string
+	diffexpr_data has a value which is a reference to a list where each element is a DifferentialExpressionUtils.DiffExprFile
+	tool_used has a value which is a string
+	tool_version has a value which is a string
+	genome_ref has a value which is a string
+	description has a value which is a string
+	type has a value which is a string
+	scale has a value which is a string
+DiffExprFile is a reference to a hash where the following keys are defined:
+	condition_mapping has a value which is a reference to a hash where the key is a string and the value is a string
+	diffexpr_filepath has a value which is a string
+SaveDiffExprMatrixSetOutput is a reference to a hash where the following keys are defined:
+	diffExprMatrixSet_ref has a value which is a string
+
+
+=end text
+
+=item Description
+
+Uploads the differential expression  *
+
+=back
+
+=cut
+
+ sub save_differential_expression_matrix_set
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function save_differential_expression_matrix_set (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to save_differential_expression_matrix_set:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'save_differential_expression_matrix_set');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "DifferentialExpressionUtils.save_differential_expression_matrix_set",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'save_differential_expression_matrix_set',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method save_differential_expression_matrix_set",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'save_differential_expression_matrix_set',
 				       );
     }
 }
@@ -525,12 +635,13 @@ an int
                                             The object ref is 'ws_name_or_id/obj_name_or_id'
                                             where ws_name_or_id is the workspace name or id
                                             and obj_name_or_id is the object name or id
-        string   source_dir             -   directory with the files to be uploaded
-        string   expressionset_ref      -   expressionset object reference
+
+        string   diffexpr_filepath      -   file path of the differential expression data file
+                                            created by cuffdiff, deseq or ballgown
+
         string   tool_used              -   cufflinks, ballgown or deseq
         string   tool_version           -   version of the tool used
-        string   diffexpr_filename      -   name of the differential expression data file
-                                            in source_dir, created by cuffdiff, deseq or ballgown
+        string   genome_ref             -   genome object reference
     *
 
 
@@ -541,13 +652,13 @@ an int
 <pre>
 a reference to a hash where the following keys are defined:
 destination_ref has a value which is a string
-source_dir has a value which is a string
-expressionset_ref has a value which is a string
+diffexpr_filepath has a value which is a string
 tool_used has a value which is a string
 tool_version has a value which is a string
-diffexpr_filename has a value which is a string
-tool_opts has a value which is a reference to a hash where the key is a string and the value is a string
-comments has a value which is a string
+genome_ref has a value which is a string
+description has a value which is a string
+type has a value which is a string
+scale has a value which is a string
 
 </pre>
 
@@ -557,13 +668,13 @@ comments has a value which is a string
 
 a reference to a hash where the following keys are defined:
 destination_ref has a value which is a string
-source_dir has a value which is a string
-expressionset_ref has a value which is a string
+diffexpr_filepath has a value which is a string
 tool_used has a value which is a string
 tool_version has a value which is a string
-diffexpr_filename has a value which is a string
-tool_opts has a value which is a reference to a hash where the key is a string and the value is a string
-comments has a value which is a string
+genome_ref has a value which is a string
+description has a value which is a string
+type has a value which is a string
+scale has a value which is a string
 
 
 =end text
@@ -589,7 +700,7 @@ comments has a value which is a string
 
 <pre>
 a reference to a hash where the following keys are defined:
-obj_ref has a value which is a string
+diffExprMatrixSet_ref has a value which is a string
 
 </pre>
 
@@ -598,7 +709,135 @@ obj_ref has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-obj_ref has a value which is a string
+diffExprMatrixSet_ref has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 DiffExprFile
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+condition_mapping has a value which is a reference to a hash where the key is a string and the value is a string
+diffexpr_filepath has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+condition_mapping has a value which is a reference to a hash where the key is a string and the value is a string
+diffexpr_filepath has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 SaveDiffExprMatrixSetParams
+
+=over 4
+
+
+
+=item Description
+
+*    Required input parameters for saving Differential expression data
+
+        string   destination_ref         -  object reference of Differential expression data.
+                                            The object ref is 'ws_name_or_id/obj_name_or_id'
+                                            where ws_name_or_id is the workspace name or id
+                                            and obj_name_or_id is the object name or id
+
+        list<DiffExprFile> diffexpr_data -  list of DiffExprFiles (condition pair & file)
+
+        string   tool_used               -  cufflinks, ballgown or deseq
+        string   tool_version            -  version of the tool used
+        string   genome_ref              -  genome object reference
+    *
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+destination_ref has a value which is a string
+diffexpr_data has a value which is a reference to a list where each element is a DifferentialExpressionUtils.DiffExprFile
+tool_used has a value which is a string
+tool_version has a value which is a string
+genome_ref has a value which is a string
+description has a value which is a string
+type has a value which is a string
+scale has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+destination_ref has a value which is a string
+diffexpr_data has a value which is a reference to a list where each element is a DifferentialExpressionUtils.DiffExprFile
+tool_used has a value which is a string
+tool_version has a value which is a string
+genome_ref has a value which is a string
+description has a value which is a string
+type has a value which is a string
+scale has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 SaveDiffExprMatrixSetOutput
+
+=over 4
+
+
+
+=item Description
+
+*     Output from upload differential expression    *
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+diffExprMatrixSet_ref has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+diffExprMatrixSet_ref has a value which is a string
 
 
 =end text

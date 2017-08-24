@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 
 /**
- * <p>Original spec-file type: UploadDifferentialExpressionOutput</p>
+ * <p>Original spec-file type: SaveDiffExprMatrixSetOutput</p>
  * <pre>
  * *     Output from upload differential expression    *
  * </pre>
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
     "diffExprMatrixSet_ref"
 })
-public class UploadDifferentialExpressionOutput {
+public class SaveDiffExprMatrixSetOutput {
 
     @JsonProperty("diffExprMatrixSet_ref")
     private String diffExprMatrixSetRef;
@@ -39,7 +39,7 @@ public class UploadDifferentialExpressionOutput {
         this.diffExprMatrixSetRef = diffExprMatrixSetRef;
     }
 
-    public UploadDifferentialExpressionOutput withDiffExprMatrixSetRef(String diffExprMatrixSetRef) {
+    public SaveDiffExprMatrixSetOutput withDiffExprMatrixSetRef(String diffExprMatrixSetRef) {
         this.diffExprMatrixSetRef = diffExprMatrixSetRef;
         return this;
     }
@@ -56,7 +56,7 @@ public class UploadDifferentialExpressionOutput {
 
     @Override
     public String toString() {
-        return ((((("UploadDifferentialExpressionOutput"+" [diffExprMatrixSetRef=")+ diffExprMatrixSetRef)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((("SaveDiffExprMatrixSetOutput"+" [diffExprMatrixSetRef=")+ diffExprMatrixSetRef)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

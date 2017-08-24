@@ -32,8 +32,8 @@ class DifferentialExpressionUtils:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "https://github.com/kbaseapps/DifferentialExpressionUtils.git"
-    GIT_COMMIT_HASH = "76ae39b906473558b32b54acd66385e7474b0115"
+    GIT_URL = "https://github.com/ugswork/DifferentialExpressionUtils.git"
+    GIT_COMMIT_HASH = "a5145c311a61f25d3c4e5f48c00af9a308a6c24f"
 
     #BEGIN_CLASS_HEADER
 
@@ -45,6 +45,7 @@ class DifferentialExpressionUtils:
     PARAM_IN_EXPR_SET_REF = 'expressionset_ref'
     PARAM_IN_GENOME_REF = 'genome_ref'
     PARAM_IN_DIFFEXP_FILEPATH = 'diffexpr_filepath'
+    PARAM_IN_DIFFEXP_DATA = 'diffexpr_data'
 
     def log(self, message, prefix_newline=False):
         print(('\n' if prefix_newline else '') +
@@ -104,6 +105,27 @@ class DifferentialExpressionUtils:
 
         return ws_name, ws_id, obj_name_id
 
+    def _proc_save_diffexpr_params(self, ctx, params):
+        """
+        Check the presence and validity of upload expression params
+        """
+        self._check_required_param(params, [self.PARAM_IN_DST_REF,
+                                            self.PARAM_IN_GENOME_REF,
+                                            self.PARAM_IN_TOOL_USED,
+                                            self.PARAM_IN_TOOL_VER,
+                                            self.PARAM_IN_DIFFEXP_DATA
+                                            ])
+
+        ws_name, ws_id, obj_name_id = self._proc_ws_obj_params(ctx, params)
+
+        for deFile in params.get(self.PARAM_IN_DIFFEXP_DATA):
+            diffexpr_filepath = deFile.get('diffexpr_filepath')
+
+            if not (os.path.isfile(diffexpr_filepath)):
+                raise ValueError('File {} does not exist: '.format(diffexpr_filepath))
+
+        return ws_name, ws_id, obj_name_id
+
     def _get_ws_info(self, obj_ref):
 
         ws = Workspace(self.ws_url)
@@ -131,6 +153,7 @@ class DifferentialExpressionUtils:
         #END_CONSTRUCTOR
         pass
 
+
     def upload_differentialExpression(self, ctx, params):
         """
         Uploads the differential expression  *
@@ -140,24 +163,22 @@ class DifferentialExpressionUtils:
            reference of Differential expression data. The object ref is
            'ws_name_or_id/obj_name_or_id' where ws_name_or_id is the
            workspace name or id and obj_name_or_id is the object name or id
-           string   source_dir             -   directory with the files to be
-           uploaded string   expressionset_ref      -   expressionset object
-           reference string   tool_used              -   cufflinks, ballgown
-           or deseq string   tool_version           -   version of the tool
-           used string   diffexpr_filename      -   name of the differential
-           expression data file in source_dir, created by cuffdiff, deseq or
-           ballgown *) -> structure: parameter "destination_ref" of String,
-           parameter "source_dir" of String, parameter "expressionset_ref" of
-           String, parameter "tool_used" of String, parameter "tool_version"
-           of String, parameter "diffexpr_filename" of String, parameter
-           "tool_opts" of mapping from String to String, parameter "comments"
-           of String
+           string   diffexpr_filepath      -   file path of the differential
+           expression data file created by cuffdiff, deseq or ballgown string
+           tool_used              -   cufflinks, ballgown or deseq string  
+           tool_version           -   version of the tool used string  
+           genome_ref             -   genome object reference *) ->
+           structure: parameter "destination_ref" of String, parameter
+           "diffexpr_filepath" of String, parameter "tool_used" of String,
+           parameter "tool_version" of String, parameter "genome_ref" of
+           String, parameter "description" of String, parameter "type" of
+           String, parameter "scale" of String
         :returns: instance of type "UploadDifferentialExpressionOutput" (*   
            Output from upload differential expression    *) -> structure:
-           parameter "obj_ref" of String
+           parameter "diffExprMatrixSet_ref" of String
         """
         # ctx is the context object
-        # return variables are: returnVal
+        # return variables are: output
         #BEGIN upload_differentialExpression
 
         self.log('Starting upload differential expression, parsing parameters ')
@@ -183,8 +204,67 @@ class DifferentialExpressionUtils:
         #END upload_differentialExpression
 
         # At some point might do deeper type checking...
-        if not isinstance(returnVal, dict):
+        if not isinstance(output, dict):
             raise ValueError('Method upload_differentialExpression return value ' +
+                             'output is not type dict as required.')
+        # return the results
+        return [output]
+
+    def save_differential_expression_matrix_set(self, ctx, params):
+        """
+        Uploads the differential expression  *
+        :param params: instance of type "SaveDiffExprMatrixSetParams" (*   
+           Required input parameters for saving Differential expression data
+           string   destination_ref         -  object reference of
+           Differential expression data. The object ref is
+           'ws_name_or_id/obj_name_or_id' where ws_name_or_id is the
+           workspace name or id and obj_name_or_id is the object name or id
+           list<DiffExprFile> diffexpr_data -  list of DiffExprFiles
+           (condition pair & file) string   tool_used               - 
+           cufflinks, ballgown or deseq string   tool_version            - 
+           version of the tool used string   genome_ref              - 
+           genome object reference *) -> structure: parameter
+           "destination_ref" of String, parameter "diffexpr_data" of list of
+           type "DiffExprFile" -> structure: parameter "condition_mapping" of
+           mapping from String to String, parameter "diffexpr_filepath" of
+           String, parameter "tool_used" of String, parameter "tool_version"
+           of String, parameter "genome_ref" of String, parameter
+           "description" of String, parameter "type" of String, parameter
+           "scale" of String
+        :returns: instance of type "SaveDiffExprMatrixSetOutput" (*    
+           Output from upload differential expression    *) -> structure:
+           parameter "diffExprMatrixSet_ref" of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN save_differential_expression_matrix_set
+
+        self.log('Starting save differential expression matrix set, parsing parameters ')
+        pprint(params)
+
+        ws_name, ws_id, obj_name_id = self._proc_save_diffexpr_params(ctx, params)
+
+        # add the following to params to pass on to create diff expr matrix
+
+        params['ws_name'] = ws_name
+        params['ws_id'] = ws_id
+        params['obj_name'] = obj_name_id
+
+        demset_ref = self.demu.save_diffexpr_matrices(params)
+
+        self.log('Differential Expression Matrix set ref: ')
+        pprint(demset_ref)
+
+        returnVal = {'diffExprMatrixSet_ref': demset_ref}
+
+        print('Saved object: ')
+        print(returnVal)
+
+        #END save_differential_expression_matrix_set
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method save_differential_expression_matrix_set return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

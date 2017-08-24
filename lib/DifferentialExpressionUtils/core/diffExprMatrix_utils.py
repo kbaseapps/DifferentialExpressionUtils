@@ -2,6 +2,7 @@ import os
 import csv
 import uuid
 import errno
+import re
 from pprint import pprint
 from datetime import datetime
 from collections import namedtuple
@@ -13,6 +14,8 @@ from KBaseFeatureValues.KBaseFeatureValuesClient import KBaseFeatureValues
 from SetAPI.SetAPIClient import SetAPI
 
 class GenDiffExprMatrix:
+
+    INVALID_WS_OBJ_NAME_RE = re.compile('[^\\w\\|._-]')
 
     def __init__(self, config, logger=None):
         self.config = config
@@ -43,6 +46,9 @@ class GenDiffExprMatrix:
     def setup_data(self):
 
         self.new_col_names = ['gene_id', 'log2_fold_change', 'p_value', 'q_value']
+
+    def sanitize(self, ws_name):
+        return ws_name
 
     def gen_matrix(self, infile, old_col_names, delimiter):
         with open(infile, 'rb') as source:
@@ -245,7 +251,6 @@ class GenDiffExprMatrix:
             for ofile in outfiles:
                 ofile.close()
 
-            count = 0
             set_items = list()
             for cond_pair, file_info in condPair_fileInfo.iteritems():
                 print 'Cond_pair: ', cond_pair
@@ -254,22 +259,66 @@ class GenDiffExprMatrix:
 
                 data_matrix = self.gen_cuffdiff_matrix(tsv_file)
 
-                dem_ref = self.save_diff_expr_matrix(self.params.get('obj_name')+'_'+str(count),
-                                                                     data_matrix,
-                                                                     cond_pair.condition1,
-                                                                     cond_pair.condition2)
+                object_name = self.params.get('obj_name') + '_' + \
+                                               self.sanitize(cond_pair.condition1) + '_' + \
+                                               self.sanitize(cond_pair.condition2)
+                dem_ref = self.save_diff_expr_matrix(object_name,
+                                                     data_matrix,
+                                                     cond_pair.condition1,
+                                                     cond_pair.condition2)
                 print('process_cuffdiff_file: DEM_REF: ' + dem_ref)
                 set_items.append({
                                     'label': cond_pair.condition1+', '+cond_pair.condition2,
                                     'ref': dem_ref
                                     })
-                count += 1
 
         matrix_set = {
                         'description': 'cuffdiff Diff Exp Matrix Set',
                         'items': set_items
                       }
         return self.save_diff_expr_matrix_set(self.params.get('obj_name'), matrix_set)
+
+    """
+    Functions for save_differentialExpressionMatrixSet
+    """
+
+    def save_matrix(self, infile, in_col_names, delimiter):
+        with open(infile, 'rb') as source:
+            rdr = csv.DictReader(source, delimiter=delimiter)
+            col_names = in_col_names[1:]
+            row_names = []
+            values = []
+            for row in rdr:
+                try:
+                    values.append([float(row[v]) for v in in_col_names[1:]])
+                except:
+                    values_list = []
+                    for v in in_col_names[1:]:
+                        tmpval = row[v]
+                        if isinstance(tmpval, (int, long, float)):
+                            values_list.append(float(tmpval))
+                        elif isinstance(tmpval, basestring):
+                            if 'na' in tmpval.lower():
+                                values_list.append(None)
+                            else:
+                                tmpval = tmpval.replace("'", "")
+                                tmpval = tmpval.replace('"', '')
+                                values_list.append(float(tmpval))
+                        else:
+                            raise ValueError("invalid type in input file: {}".format(tmpval))
+                    values.append(values_list)
+                row_names.append(row[in_col_names[0]])
+
+        twoD_matrix = {'row_ids': row_names,
+                       'col_ids': col_names,
+                       'values': values
+                       }
+
+        return twoD_matrix
+
+    def get_obj_name(self, condition1, condition2):
+
+        return self.params.get('obj_name') + '_' + condition1 + '_' + condition2
 
     def gen_diffexpr_matrices(self, params):
 
@@ -288,3 +337,52 @@ class GenDiffExprMatrix:
             raise ValueError('"{}" is not a valid tool_used parameter'
                              .format(self.params.get('tool_used')))
         return dem_ref
+
+    def save_diffexpr_matrices(self, params):
+
+        print('In SAVE DEMs')
+        self.params = params
+        self.setup_data()
+
+        set_items = list()
+        for deFile in self.params.get('diffexpr_data'):
+            condition_mapping = deFile.get('condition_mapping')
+            diffexpr_filepath = deFile.get('diffexpr_filepath')
+
+            if deFile.get('delimter', None) is not None:
+                delimiter = deFile.get('delimter')
+            else:
+                delimiter = '\t'
+                fileext = os.path.splitext(diffexpr_filepath)[1]
+
+                if 'csv' in fileext.lower():
+                    delimiter = ','
+                elif 'tsv' in fileext.lower():
+                    delimiter = '\t'
+                else:
+                    self.logger.warning('Using tab delimiter')
+
+            data_matrix = self.save_matrix(diffexpr_filepath,
+                                           self.new_col_names,
+                                           delimiter)
+
+            condition1, condition2 = condition_mapping.items()[0]
+            object_name = self.get_obj_name(condition1, condition2)
+            dem_ref = self.save_diff_expr_matrix(object_name,
+                                                 data_matrix,
+                                                 condition1,
+                                                 condition2 )
+            set_items.append({
+                'label': condition1 + ', ' + condition2,
+                'ref': dem_ref
+            })
+
+        matrix_set = {
+            'description': self.params.get('tool_used') + ' Differential Expression Matrix Set',
+            'items': set_items
+        }
+        return self.save_diff_expr_matrix_set(self.params.get('obj_name'), matrix_set)
+
+
+
+
