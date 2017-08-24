@@ -58,11 +58,18 @@ module DifferentialExpressionUtils {
                                    returns (UploadDifferentialExpressionOutput output)
                                    authentication required;
 
-
+    /* --------------------------------------------------------------------------------- */
+    
     typedef structure {
         mapping<string,string>  condition_mapping;     /* {'condition1': 'condition2'} */
-        string                  diffexpr_filepath;
-        string                  delimiter;             /* optional  */
+        string                  diffexpr_filepath;     /*  The input file given is expected to have the columns
+                                                           'gene_id', 'log2_fold_change', 'p_value', 'q_value',
+                                                           among other columns.  */
+        string                  delimiter;             /*  optional  */
+                                                       /*  If the file extension does not indicate the delimiter,
+                                                           ('csv' or 'tsv') then the default delimiter tab is used
+                                                           for reading the values from input file. This optional
+                                                           parameter can be used to pass in another delimiter */
     } DiffExprFile;
 
     /**    Required input parameters for saving Differential expression data
@@ -105,6 +112,8 @@ module DifferentialExpressionUtils {
     funcdef  save_differential_expression_matrix_set(SaveDiffExprMatrixSetParams params)
                                             returns (SaveDiffExprMatrixSetOutput)
                                             authentication required;
+
+    /* --------------------------------------------------------------------------------- */
 
     /**
         Required input parameters for downloading Differential expression
