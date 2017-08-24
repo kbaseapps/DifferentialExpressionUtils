@@ -337,6 +337,10 @@ class Application(object):
                              name='DifferentialExpressionUtils.upload_differentialExpression',
                              types=[dict])
         self.method_authentication['DifferentialExpressionUtils.upload_differentialExpression'] = 'required'  # noqa
+        self.rpc_service.add(impl_DifferentialExpressionUtils.save_differential_expression_matrix_set,
+                             name='DifferentialExpressionUtils.save_differential_expression_matrix_set',
+                             types=[dict])
+        self.method_authentication['DifferentialExpressionUtils.save_differential_expression_matrix_set'] = 'required'  # noqa
         self.rpc_service.add(impl_DifferentialExpressionUtils.download_differentialExpression,
                              name='DifferentialExpressionUtils.download_differentialExpression',
                              types=[dict])
