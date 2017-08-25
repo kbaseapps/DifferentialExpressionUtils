@@ -110,7 +110,7 @@ sub new
 
 =head2 upload_differentialExpression
 
-  $output = $obj->upload_differentialExpression($params)
+  $return = $obj->upload_differentialExpression($params)
 
 =over 4
 
@@ -120,7 +120,7 @@ sub new
 
 <pre>
 $params is a DifferentialExpressionUtils.UploadDifferentialExpressionParams
-$output is a DifferentialExpressionUtils.UploadDifferentialExpressionOutput
+$return is a DifferentialExpressionUtils.UploadDifferentialExpressionOutput
 UploadDifferentialExpressionParams is a reference to a hash where the following keys are defined:
 	destination_ref has a value which is a string
 	diffexpr_filepath has a value which is a string
@@ -140,7 +140,7 @@ UploadDifferentialExpressionOutput is a reference to a hash where the following 
 =begin text
 
 $params is a DifferentialExpressionUtils.UploadDifferentialExpressionParams
-$output is a DifferentialExpressionUtils.UploadDifferentialExpressionOutput
+$return is a DifferentialExpressionUtils.UploadDifferentialExpressionOutput
 UploadDifferentialExpressionParams is a reference to a hash where the following keys are defined:
 	destination_ref has a value which is a string
 	diffexpr_filepath has a value which is a string

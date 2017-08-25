@@ -56,15 +56,15 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         suffix = int(time.time() * 1000)
         cls.wsName = "test_DifferentialExpressionUtils_" + str(suffix)
         cls.wsClient.create_workspace({'workspace': cls.wsName})
-        #cls.setupTestData()
+        cls.setupTestData()
 
     @classmethod
     def tearDownClass(cls):
-        '''
+
         if hasattr(cls, 'wsName'):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
-        '''
+
 
     def getWsClient(self):
         return self.__class__.wsClient
@@ -93,7 +93,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
 
-    @unittest.skip("skipped test_upload_cuffdiff_differentialExpression")
+    #@unittest.skip("skipped test_upload_cuffdiff_differentialExpression")
     def test_upload_cuffdiff_differentialExpression(self):
 
         params = {
@@ -112,7 +112,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         pprint(obj)
         print("=====================================================================")
 
-    @unittest.skip("skipped test_upload_deseq_differentialExpression")
+    #@unittest.skip("skipped test_upload_deseq_differentialExpression")
     def test_upload_deseq_differentialExpression(self):
 
         params = {
@@ -131,7 +131,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         pprint(obj)
         print("=====================================================================")
 
-    @unittest.skip("skipped test_upload_ballgown_differentialExpression")
+    #@unittest.skip("skipped test_upload_ballgown_differentialExpression")
     def test_upload_ballgown_differentialExpression(self):
 
         params = {
@@ -157,7 +157,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
     def test_save_deseq_differentialExpression(self):
         params = {
             'destination_ref': self.getWsName() + '/test_save_deseq_diffexp',
-            'genome_ref': '5264/20/3', #self.genome_ref,
+            'genome_ref': self.genome_ref,
             'tool_used': 'deseq',
             'tool_version': 'deseq_version',
             'diffexpr_data': [ {'condition_mapping': {'c1': 'c2'},
@@ -177,7 +177,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         pprint(obj)
         print("=====================================================================")
 
-    '''
+
     def fail_upload_diffexpr(self, params, error, exception=ValueError, do_startswith=False):
 
         test_name = inspect.stack()[1][3]
@@ -298,4 +298,4 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                     'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
                                     },
                                     'tool_version parameter is required')
-    '''
+

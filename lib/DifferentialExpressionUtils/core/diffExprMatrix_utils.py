@@ -66,7 +66,7 @@ class GenDiffExprMatrix:
                         if isinstance(tmpval, (int, long, float)):
                             values_list.append(float(tmpval))
                         elif isinstance(tmpval, basestring):
-                            if 'na' in tmpval.lower():
+                            if 'na' in tmpval.lower() or 'none' in tmpval.lower():
                                 values_list.append(None)
                             else:
                                 tmpval = tmpval.replace("'", "")
@@ -298,7 +298,7 @@ class GenDiffExprMatrix:
                         if isinstance(tmpval, (int, long, float)):
                             values_list.append(float(tmpval))
                         elif isinstance(tmpval, basestring):
-                            if 'na' in tmpval.lower():
+                            if 'na' in tmpval.lower() or 'none' in tmpval.lower():
                                 values_list.append(None)
                             else:
                                 tmpval = tmpval.replace("'", "")
@@ -360,7 +360,7 @@ class GenDiffExprMatrix:
                 elif 'tsv' in fileext.lower():
                     delimiter = '\t'
                 else:
-                    self.logger.warning('Using tab delimiter')
+                    print('Using tab delimiter')
 
             data_matrix = self.save_matrix(diffexpr_filepath,
                                            self.new_col_names,

@@ -1,0 +1,16 @@
+{
+    "name" : "Save Differential Expression Matrix Set",
+    "short_description" : "Saves Differential Expression data in KBase",
+    "long_description" : "Saves Differential Expression data for different condition pairs in KBase",
+    "tags" : {
+        "categories" : ["save"],
+        "input": {
+            "file_types": [],
+            "kb_types": []
+        },
+        "output": {
+            "file_types": [],
+            "kb_types": ["KBaseFeatureValues.DifferentialExpressionMatrix", "KBaseSets.DifferentialExpressionMatrixSet"]
+        }
+    }
+}

@@ -33,7 +33,7 @@ class DifferentialExpressionUtils:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/ugswork/DifferentialExpressionUtils.git"
-    GIT_COMMIT_HASH = "a014d560cccad553833b7ed343224759f2b2bda4"
+    GIT_COMMIT_HASH = "aeea7095359fcede44dbd9e65880f70f719043ef"
 
     #BEGIN_CLASS_HEADER
 
@@ -178,7 +178,7 @@ class DifferentialExpressionUtils:
            parameter "diffExprMatrixSet_ref" of String
         """
         # ctx is the context object
-        # return variables are: output
+        # return variables are: returnVal
         #BEGIN upload_differentialExpression
 
         self.log('Starting upload differential expression, parsing parameters ')
@@ -204,11 +204,11 @@ class DifferentialExpressionUtils:
         #END upload_differentialExpression
 
         # At some point might do deeper type checking...
-        if not isinstance(output, dict):
+        if not isinstance(returnVal, dict):
             raise ValueError('Method upload_differentialExpression return value ' +
-                             'output is not type dict as required.')
+                             'returnVal is not type dict as required.')
         # return the results
-        return [output]
+        return [returnVal]
 
     def save_differential_expression_matrix_set(self, ctx, params):
         """
