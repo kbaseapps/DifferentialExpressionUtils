@@ -66,9 +66,7 @@ class GenDiffExprMatrix:
                         if isinstance(tmpval, (int, long, float)):
                             values_list.append(float(tmpval))
                         elif isinstance(tmpval, basestring):
-                            if 'na' in tmpval.lower():
-                                values_list.append(None)
-                            elif 'none' in tmpval.lower():
+                            if 'na' in tmpval.lower() or 'none' in tmpval.lower():
                                 values_list.append(None)
                             else:
                                 tmpval = tmpval.replace("'", "")
@@ -300,9 +298,7 @@ class GenDiffExprMatrix:
                         if isinstance(tmpval, (int, long, float)):
                             values_list.append(float(tmpval))
                         elif isinstance(tmpval, basestring):
-                            if 'na' in tmpval.lower():
-                                values_list.append(None)
-                            elif 'none' in tmpval.lower():
+                            if 'na' in tmpval.lower() or 'none' in tmpval.lower():
                                 values_list.append(None)
                             else:
                                 tmpval = tmpval.replace("'", "")
