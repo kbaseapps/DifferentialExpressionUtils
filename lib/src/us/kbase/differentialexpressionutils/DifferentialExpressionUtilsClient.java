@@ -168,7 +168,7 @@ public class DifferentialExpressionUtilsClient {
      * *  Uploads the differential expression  *
      * </pre>
      * @param   params   instance of type {@link us.kbase.differentialexpressionutils.UploadDifferentialExpressionParams UploadDifferentialExpressionParams}
-     * @return   parameter "output" of type {@link us.kbase.differentialexpressionutils.UploadDifferentialExpressionOutput UploadDifferentialExpressionOutput}
+     * @return   instance of type {@link us.kbase.differentialexpressionutils.UploadDifferentialExpressionOutput UploadDifferentialExpressionOutput}
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */

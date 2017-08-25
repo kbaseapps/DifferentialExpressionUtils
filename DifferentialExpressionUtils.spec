@@ -55,7 +55,7 @@ module DifferentialExpressionUtils {
     /**  Uploads the differential expression  **/
 
     funcdef  upload_differentialExpression(UploadDifferentialExpressionParams params)
-                                   returns (UploadDifferentialExpressionOutput output)
+                                   returns (UploadDifferentialExpressionOutput)
                                    authentication required;
 
     /* --------------------------------------------------------------------------------- */
