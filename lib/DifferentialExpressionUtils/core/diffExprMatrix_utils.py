@@ -305,10 +305,6 @@ class GenDiffExprMatrix:
 
         feature_ids = self.get_feature_ids(genome_ref)
 
-        print('============  Feature IDS  ====================')
-        pprint(feature_ids)
-        print('===============================================')
-
         with open(infile, 'rb') as source:
             rdr = csv.DictReader(source, delimiter=delimiter)
             col_names = in_col_names[1:]
