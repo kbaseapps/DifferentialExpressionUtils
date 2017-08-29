@@ -13,6 +13,8 @@ from DataFileUtil.baseclient import ServerError as DFUError
 from KBaseFeatureValues.KBaseFeatureValuesClient import KBaseFeatureValues
 from SetAPI.SetAPIClient import SetAPI
 
+from GenomeSearchUtil.GenomeSearchUtilClient import GenomeSearchUtil
+
 class GenDiffExprMatrix:
 
     INVALID_WS_OBJ_NAME_RE = re.compile('[^\\w\\|._-]')
@@ -27,6 +29,7 @@ class GenDiffExprMatrix:
         self.fv = KBaseFeatureValues(self.callback_url)
         self.dfu = DataFileUtil(self.callback_url)
         self.setAPI = SetAPI(self.callback_url)
+        self.gsu = GenomeSearchUtil(self.callback_url)
         self._mkdir_p(self.scratch)
 
     def _mkdir_p(self, path):
@@ -49,6 +52,22 @@ class GenDiffExprMatrix:
 
     def sanitize(self, ws_name):
         return ws_name
+
+    def get_feature_ids(self, genome_ref):
+        """
+        _get_feature_ids: get feature ids from genome
+        """
+
+        feature_num = self.gsu.search({'ref': genome_ref})['num_found']
+
+        genome_features = self.gsu.search({'ref': genome_ref,
+                                           'limit': feature_num,
+                                           'sort_by': [['feature_id', True]]})['features']
+
+        features_ids = map(lambda genome_feature: genome_feature.get('feature_id'),
+                           genome_features)
+
+        return list(set(features_ids))
 
     def gen_matrix(self, infile, old_col_names, delimiter):
         with open(infile, 'rb') as source:
@@ -282,13 +301,22 @@ class GenDiffExprMatrix:
     Functions for save_differentialExpressionMatrixSet
     """
 
-    def save_matrix(self, infile, in_col_names, delimiter):
+    def save_matrix(self, genome_ref, infile, in_col_names, delimiter):
+
+        feature_ids = self.get_feature_ids(genome_ref)
+
         with open(infile, 'rb') as source:
             rdr = csv.DictReader(source, delimiter=delimiter)
             col_names = in_col_names[1:]
             row_names = []
             values = []
             for row in rdr:
+                if row[in_col_names[0]] in feature_ids:
+                    row_names.append(row[in_col_names[0]])
+                else:
+                    error_msg = 'Gene_id "{}" is not a known feature'.format(row[in_col_names[0]])
+                    raise ValueError(error_msg)
+
                 try:
                     values.append([float(row[v]) for v in in_col_names[1:]])
                 except:
@@ -307,7 +335,6 @@ class GenDiffExprMatrix:
                         else:
                             raise ValueError("invalid type in input file: {}".format(tmpval))
                     values.append(values_list)
-                row_names.append(row[in_col_names[0]])
 
         twoD_matrix = {'row_ids': row_names,
                        'col_ids': col_names,
@@ -362,7 +389,8 @@ class GenDiffExprMatrix:
                 else:
                     print('Using tab delimiter')
 
-            data_matrix = self.save_matrix(diffexpr_filepath,
+            data_matrix = self.save_matrix(self.params.get('genome_ref'),
+                                           diffexpr_filepath,
                                            self.new_col_names,
                                            delimiter)
 

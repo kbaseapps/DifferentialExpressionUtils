@@ -177,7 +177,6 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         pprint(obj)
         print("=====================================================================")
 
-
     def fail_upload_diffexpr(self, params, error, exception=ValueError, do_startswith=False):
 
         test_name = inspect.stack()[1][3]
@@ -299,3 +298,33 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                     },
                                     'tool_version parameter is required')
 
+    def fail_save_diffexpr(self, params, error, exception=ValueError, do_startswith=False):
+
+        test_name = inspect.stack()[1][3]
+        print('\n******** starting expected save fail test: ' + test_name + ' *********')
+        print('-------------------------------------------------------------------------------------')
+
+        with self.assertRaises(exception) as context:
+            self.getImpl().save_differential_expression_matrix_set(self.ctx, params)
+        if do_startswith:
+            self.assertTrue(str(context.exception.message).startswith(error),
+                            "Error message {} does not start with {}".format(
+                                str(context.exception.message),
+                                error))
+        else:
+            self.assertEqual(error, str(context.exception.message))
+
+    def test_save_fail_incorrect_gene_id(self):
+        self.fail_save_diffexpr({'destination_ref': self.getWsName() + '/test_save_error_deseq_diffexp',
+            'genome_ref': self.genome_ref,
+            'tool_used': 'deseq',
+            'tool_version': 'deseq_version',
+            'diffexpr_data': [ {'condition_mapping': {'c1': 'c2'},
+                                'diffexpr_filepath': 'data/deseq_output/sig_genes_results_error.csv'},
+                               {'condition_mapping': {'c2': 'c3'},
+                                'diffexpr_filepath': 'data/deseq_output/sig_genes_results_small_23.csv'},
+                               {'condition_mapping': {'c1': 'c3'},
+                                'diffexpr_filepath': 'data/deseq_output/sig_genes_results_small_13.csv'}
+                              ]
+                            },
+            'Gene_id "AT1G79075" is not a known feature')
