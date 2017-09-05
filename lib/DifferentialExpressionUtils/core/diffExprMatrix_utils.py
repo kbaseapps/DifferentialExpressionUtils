@@ -314,9 +314,20 @@ class GenDiffExprMatrix:
                 if row[in_col_names[0]] in feature_ids:
                     row_names.append(row[in_col_names[0]])
                 else:
-                    error_msg = 'Gene_id "{}" is not a known feature'.format(row[in_col_names[0]])
-                    raise ValueError(error_msg)
-
+                    gene_ids = row[in_col_names[0]].strip().split(',')
+                    match = True
+                    mismatched_gene_id = None
+                    for gene_id in gene_ids:
+                        if gene_id not in feature_ids:
+                            mismatched_gene_id = gene_id
+                            match = False
+                            break
+                    if match:
+                        row_names.append(row[in_col_names[0]])
+                    else:
+                        error_msg = 'Gene_id "{}" is not a known feature in "{}"'.format(mismatched_gene_id,
+                                                                                       row[in_col_names[0]])
+                        raise ValueError(error_msg)
                 try:
                     values.append([float(row[v]) for v in in_col_names[1:]])
                 except:
