@@ -93,7 +93,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
 
-    #@unittest.skip("skipped test_upload_cuffdiff_differentialExpression")
+    @unittest.skip("skipped test_upload_cuffdiff_differentialExpression")
     def test_upload_cuffdiff_differentialExpression(self):
 
         params = {
@@ -112,7 +112,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         pprint(obj)
         print("=====================================================================")
 
-    #@unittest.skip("skipped test_upload_deseq_differentialExpression")
+    @unittest.skip("skipped test_upload_deseq_differentialExpression")
     def test_upload_deseq_differentialExpression(self):
 
         params = {
@@ -131,7 +131,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         pprint(obj)
         print("=====================================================================")
 
-    #@unittest.skip("skipped test_upload_ballgown_differentialExpression")
+    @unittest.skip("skipped test_upload_ballgown_differentialExpression")
     def test_upload_ballgown_differentialExpression(self):
 
         params = {
@@ -166,6 +166,30 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                 'diffexpr_filepath': 'data/deseq_output/sig_genes_results_small_23.csv'},
                                {'condition_mapping': {'c1': 'c3'},
                                 'diffexpr_filepath': 'data/deseq_output/sig_genes_results_small_13.csv'}
+                              ]
+        }
+        retVal = self.getImpl().save_differential_expression_matrix_set(self.ctx, params)[0]
+
+        obj = self.dfu.get_objects(
+            {'object_refs': [retVal.get('diffExprMatrixSet_ref')]})['data'][0]
+
+        print("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
+        pprint(obj)
+        print("=====================================================================")
+
+    @unittest.skip("skipped test_save_cuffdiff_differentialExpression")
+    def test_save_cuffdiff_differentialExpression(self):
+        params = {
+            'destination_ref': self.getWsName() + '/test_save_cuffdiff_diffexp',
+            'genome_ref': '3682/2/4',
+            'tool_used': 'cuffdiff',
+            'tool_version': 'cuffdiff_version',
+            'diffexpr_data': [{'condition_mapping': {'low': 'high'},
+                               'diffexpr_filepath': 'data/cuffdiff_output_3conditions/cuffdiff_low_high.tsv'},
+                              {'condition_mapping': {'low': 'ks78'},
+                               'diffexpr_filepath': 'data/cuffdiff_output_3conditions/cuffdiff_low_ks78.tsv'},
+                              {'condition_mapping': {'high': 'ks78'},
+                               'diffexpr_filepath': 'data/cuffdiff_output_3conditions/cuffdiff_high_ks78.tsv'}
                               ]
         }
         retVal = self.getImpl().save_differential_expression_matrix_set(self.ctx, params)[0]
@@ -327,4 +351,5 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                 'diffexpr_filepath': 'data/deseq_output/sig_genes_results_small_13.csv'}
                               ]
                             },
-            'Gene_id "AT1G79075" is not a known feature')
+            'Gene_id(s) "AT1G79075" is not a known feature in "AT1G79075"')
+
