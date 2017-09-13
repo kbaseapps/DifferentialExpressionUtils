@@ -125,6 +125,18 @@ class DifferentialExpressionUtils(object):
             'DifferentialExpressionUtils.export_differentialExpression',
             [params], self._service_ver, context)
 
+    def export_diff_expr_matrix_as_tsv(self, params, context=None):
+        """
+        Export DifferenitalExpressionMatrix object as tsv
+        :param params: instance of type "ExportMatrixTSVParams" -> structure:
+           parameter "input_ref" of String
+        :returns: instance of type "ExportMatrixTSVOutput" -> structure:
+           parameter "shock_id" of String
+        """
+        return self._client.call_method(
+            'DifferentialExpressionUtils.export_diff_expr_matrix_as_tsv',
+            [params], self._service_ver, context)
+
     def status(self, context=None):
         return self._client.call_method('DifferentialExpressionUtils.status',
                                         [], self._service_ver, context)

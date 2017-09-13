@@ -162,4 +162,16 @@ module DifferentialExpressionUtils {
     funcdef export_differentialExpression(ExportParams params)
                      returns (ExportOutput output)
                      authentication required;
+
+    typedef structure {
+        string input_ref;
+    } ExportMatrixTSVParams;
+    typedef structure {
+        string shock_id;
+    } ExportMatrixTSVOutput;
+
+    /*Export DifferenitalExpressionMatrix object as tsv
+    */
+    funcdef export_diff_expr_matrix_as_tsv(ExportMatrixTSVParams params)
+        returns (ExportMatrixTSVOutput) authentication required;
 };

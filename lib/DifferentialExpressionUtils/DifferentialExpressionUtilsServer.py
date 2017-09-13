@@ -349,6 +349,10 @@ class Application(object):
                              name='DifferentialExpressionUtils.export_differentialExpression',
                              types=[dict])
         self.method_authentication['DifferentialExpressionUtils.export_differentialExpression'] = 'required'  # noqa
+        self.rpc_service.add(impl_DifferentialExpressionUtils.export_diff_expr_matrix_as_tsv,
+                             name='DifferentialExpressionUtils.export_diff_expr_matrix_as_tsv',
+                             types=[dict])
+        self.method_authentication['DifferentialExpressionUtils.export_diff_expr_matrix_as_tsv'] = 'required'  # noqa
         self.rpc_service.add(impl_DifferentialExpressionUtils.status,
                              name='DifferentialExpressionUtils.status',
                              types=[dict])

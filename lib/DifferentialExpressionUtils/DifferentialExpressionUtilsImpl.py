@@ -4,6 +4,8 @@ import os
 import time
 import glob
 from datetime import datetime
+import uuid
+import errno
 
 from pprint import pprint
 from pprint import pformat
@@ -31,9 +33,9 @@ class DifferentialExpressionUtils:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.0.1"
-    GIT_URL = "https://github.com/ugswork/DifferentialExpressionUtils.git"
-    GIT_COMMIT_HASH = "aeea7095359fcede44dbd9e65880f70f719043ef"
+    VERSION = "0.1.0"
+    GIT_URL = "https://github.com/Tianhao-Gu/DifferentialExpressionUtils.git"
+    GIT_COMMIT_HASH = "2573061422c9733b76741707432174fc1d2fd85e"
 
     #BEGIN_CLASS_HEADER
 
@@ -366,6 +368,71 @@ class DifferentialExpressionUtils:
                              'output is not type dict as required.')
         # return the results
         return [output]
+
+    def export_diff_expr_matrix_as_tsv(self, ctx, params):
+        """
+        Export DifferenitalExpressionMatrix object as tsv
+        :param params: instance of type "ExportMatrixTSVParams" -> structure:
+           parameter "input_ref" of String
+        :returns: instance of type "ExportMatrixTSVOutput" -> structure:
+           parameter "shock_id" of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN export_diff_expr_matrix_as_tsv
+
+        self.log('Running export_diff_expr_matrix_as_tsv with params:\n' +
+                 pformat(params))
+
+        inref = params.get('input_ref')
+        if not inref:
+            raise ValueError('{} parameter is required'.format('input_ref'))
+
+        try:
+            diff_expr_obj = self.dfu.get_objects({'object_refs': [inref]})['data'][0]
+        except DFUError as e:
+            self.log('Logging stacktrace from workspace exception:\n' + e.data)
+            raise
+
+        output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
+        try:
+            os.makedirs(output_directory)
+        except OSError as exc:
+            if exc.errno == errno.EEXIST and os.path.isdir(output_directory):
+                pass
+            else:
+                raise
+
+        diff_expr_data = diff_expr_obj['data']
+        diff_expr_info = diff_expr_obj['info']
+        diff_expr_name = diff_expr_info[1]
+
+        tsv_output = diff_expr_name + '.TSV'
+
+        with open(os.path.join(output_directory, tsv_output), 'w') as output:
+            col_ids = diff_expr_data['data']['col_ids']
+            row_ids = diff_expr_data['data']['row_ids']
+            values = diff_expr_data['data']['values']
+            output.write('\t' + '\t'.join(col_ids) + '\n')
+            for i, row_id in enumerate(row_ids):
+                line = row_id + '\t' + '\t'.join(map(str, values[i])) + '\n'
+                output.write(line)
+
+        file_to_shock_params = {
+            'file_path': output_directory,
+            'pack': 'zip'
+        }
+        shock_id = self.dfu.file_to_shock(file_to_shock_params)['shock_id']
+
+        returnVal = {'shock_id': shock_id}
+        #END export_diff_expr_matrix_as_tsv
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method export_diff_expr_matrix_as_tsv return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK",

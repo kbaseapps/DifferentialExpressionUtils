@@ -4,6 +4,9 @@ import os  # noqa: F401
 import time
 import shutil
 import inspect
+import uuid
+import hashlib
+import requests
 
 from os import environ
 try:
@@ -24,7 +27,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        token = environ.get('KB_AUTH_TOKEN', None)
+        cls.token = environ.get('KB_AUTH_TOKEN', None)
         config_file = environ.get('KB_DEPLOYMENT_CONFIG', None)
         cls.cfg = {}
         config = ConfigParser()
@@ -34,11 +37,11 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
         auth_client = _KBaseAuth(authServiceUrl)
-        user_id = auth_client.get_user(token)
+        user_id = auth_client.get_user(cls.token)
         # WARNING: don't call any logging methods on the context object,
         # it'll result in a NoneType error
         cls.ctx = MethodContext(None)
-        cls.ctx.update({'token': token,
+        cls.ctx.update({'token': cls.token,
                         'user_id': user_id,
                         'provenance': [
                             {'service': 'DifferentialExpressionUtils',
@@ -46,6 +49,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                              'method_params': []
                              }],
                         'authenticated': 1})
+        cls.shockURL = cls.cfg['shock-url']
         cls.wsURL = cls.cfg['workspace-url']
         cls.wsClient = workspaceService(cls.wsURL)
         cls.serviceImpl = DifferentialExpressionUtils(cls.cfg)
@@ -353,3 +357,57 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                             },
             'Gene_id(s) "AT1G79075" is not a known feature in "AT1G79075"')
 
+    def test_export_diff_expr_matrix_as_tsv(self):
+        # upload DiffExpressionMatrix
+        test_diff_expr_matrix_name = 'Test_DifferentialExpressionMatrix'
+        test_diff_expr_matrix_data = {'data': {'col_ids': ['log2_fold_change', 'p_value', 'q_value'],
+                                               'row_ids': ['AT2G01021', 'AT1G29930', 'AT1G29920'],
+                                               'values': [[3.79140473105837,
+                                                           2.26591691723009e-245,
+                                                           2.68601791368455e-241],
+                                                          [-1.43886161633931,
+                                                           2.48519356787327e-70,
+                                                           1.47297422767849e-66],
+                                                          [-1.80444851441642,
+                                                           1.61589558262449e-51,
+                                                           6.38494207881023e-48]]},
+                                      'type': 'log2_level',
+                                      'scale': '1.0'}
+
+        save_object_params = {
+            'id': self.dfu.ws_name_to_id(self.wsName),
+            'objects': [{'type': 'KBaseFeatureValues.DifferentialExpressionMatrix',
+                         'data': test_diff_expr_matrix_data,
+                         'name': test_diff_expr_matrix_name}]
+        }
+
+        dfu_oi = self.dfu.save_objects(save_object_params)[0]
+        diff_expr_matrix_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
+
+        params = {'input_ref': diff_expr_matrix_ref}
+        retVal = self.getImpl().export_diff_expr_matrix_as_tsv(self.ctx, params)[0]
+
+        shocknode = retVal['shock_id']
+
+        zipdir = os.path.join(self.scratch, str(uuid.uuid4()))
+        os.makedirs(zipdir)
+        self.dfu.shock_to_file(
+            {'shock_id': shocknode,
+             'unpack': 'unpack',
+             'file_path': zipdir
+             })
+        result_files = os.listdir(zipdir)
+
+        file_name = test_diff_expr_matrix_name + '.TSV'
+        self.assertTrue(file_name in result_files)
+
+        md5 = hashlib.md5(open(os.path.join(zipdir, file_name), 'rb')
+                          .read()).hexdigest()
+
+        expect_md5 = '3ac17d2f525b98c6bd2fef88a14e6f23'
+        self.assertEqual(md5, expect_md5)
+
+        header = {'Authorization': 'Oauth {0}'.format(self.token)}
+        requests.delete(self.shockURL + '/node/' + shocknode, headers=header,
+                        allow_redirects=True)
+        print('Deleted shock node ' + shocknode)

@@ -234,6 +234,24 @@ public class DifferentialExpressionUtilsClient {
         return res.get(0);
     }
 
+    /**
+     * <p>Original spec-file function name: export_diff_expr_matrix_as_tsv</p>
+     * <pre>
+     * Export DifferenitalExpressionMatrix object as tsv
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.differentialexpressionutils.ExportMatrixTSVParams ExportMatrixTSVParams}
+     * @return   instance of type {@link us.kbase.differentialexpressionutils.ExportMatrixTSVOutput ExportMatrixTSVOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public ExportMatrixTSVOutput exportDiffExprMatrixAsTsv(ExportMatrixTSVParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<ExportMatrixTSVOutput>> retType = new TypeReference<List<ExportMatrixTSVOutput>>() {};
+        List<ExportMatrixTSVOutput> res = caller.jsonrpcCall("DifferentialExpressionUtils.export_diff_expr_matrix_as_tsv", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
     public Map<String, Object> status(RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         TypeReference<List<Map<String, Object>>> retType = new TypeReference<List<Map<String, Object>>>() {};
