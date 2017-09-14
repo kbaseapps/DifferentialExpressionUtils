@@ -502,6 +502,96 @@ Wrapper function for use by in-narrative downloaders to download expressions fro
     }
 }
  
+
+
+=head2 export_diff_expr_matrix_as_tsv
+
+  $return = $obj->export_diff_expr_matrix_as_tsv($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a DifferentialExpressionUtils.ExportMatrixTSVParams
+$return is a DifferentialExpressionUtils.ExportMatrixTSVOutput
+ExportMatrixTSVParams is a reference to a hash where the following keys are defined:
+	input_ref has a value which is a string
+ExportMatrixTSVOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a DifferentialExpressionUtils.ExportMatrixTSVParams
+$return is a DifferentialExpressionUtils.ExportMatrixTSVOutput
+ExportMatrixTSVParams is a reference to a hash where the following keys are defined:
+	input_ref has a value which is a string
+ExportMatrixTSVOutput is a reference to a hash where the following keys are defined:
+	shock_id has a value which is a string
+
+
+=end text
+
+=item Description
+
+Export DifferenitalExpressionMatrix object as tsv
+
+=back
+
+=cut
+
+ sub export_diff_expr_matrix_as_tsv
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function export_diff_expr_matrix_as_tsv (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to export_diff_expr_matrix_as_tsv:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'export_diff_expr_matrix_as_tsv');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "DifferentialExpressionUtils.export_diff_expr_matrix_as_tsv",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'export_diff_expr_matrix_as_tsv',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method export_diff_expr_matrix_as_tsv",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'export_diff_expr_matrix_as_tsv',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -545,16 +635,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'export_differentialExpression',
+                method_name => 'export_diff_expr_matrix_as_tsv',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method export_differentialExpression",
+            error => "Error invoking method export_diff_expr_matrix_as_tsv",
             status_line => $self->{client}->status_line,
-            method_name => 'export_differentialExpression',
+            method_name => 'export_diff_expr_matrix_as_tsv',
         );
     }
 }
@@ -974,6 +1064,66 @@ source_ref has a value which is a string
 
 
 =head2 ExportOutput
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+shock_id has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+shock_id has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ExportMatrixTSVParams
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+input_ref has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+input_ref has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ExportMatrixTSVOutput
 
 =over 4
 
