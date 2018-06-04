@@ -93,12 +93,12 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         cls.genome_ref = cls.gfu.genbank_to_genome({'file': {'path': genbank_file_path},
                                                     'workspace_name': cls.wsName,
                                                     'genome_name': genome_object_name,
-                                                    'generate_missing_genes': 1,
+                                                    'generate_missing_genes': 1
                                                     })['genome_ref']
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
 
-    @unittest.skip("skipped test_upload_cuffdiff_differentialExpression")
+    #@unittest.skip("skipped test_upload_cuffdiff_differentialExpression")
     def test_upload_cuffdiff_differentialExpression(self):
 
         params = {
@@ -117,7 +117,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         pprint(obj)
         print("=====================================================================")
 
-    @unittest.skip("skipped test_upload_deseq_differentialExpression")
+    #@unittest.skip("skipped test_upload_deseq_differentialExpression")
     def test_upload_deseq_differentialExpression(self):
 
         params = {
@@ -136,7 +136,8 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         pprint(obj)
         print("=====================================================================")
 
-    @unittest.skip("skipped test_upload_ballgown_differentialExpression")
+
+    #@unittest.skip("skipped test_upload_ballgown_differentialExpression")
     def test_upload_ballgown_differentialExpression(self):
 
         params = {
