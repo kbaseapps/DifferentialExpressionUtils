@@ -92,7 +92,8 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         genome_object_name = 'test_Genome'
         cls.genome_ref = cls.gfu.genbank_to_genome({'file': {'path': genbank_file_path},
                                                     'workspace_name': cls.wsName,
-                                                    'genome_name': genome_object_name
+                                                    'genome_name': genome_object_name,
+                                                    'generate_missing_genes': 1,
                                                     })['genome_ref']
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
@@ -330,7 +331,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
 
         test_name = inspect.stack()[1][3]
         print('\n******** starting expected save fail test: ' + test_name + ' *********')
-        print('-------------------------------------------------------------------------------------')
+        print('----------------------------------------------------------------------------------')
 
         with self.assertRaises(exception) as context:
             self.getImpl().save_differential_expression_matrix_set(self.ctx, params)
@@ -343,19 +344,17 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
             self.assertEqual(error, str(context.exception.message))
 
     def test_save_fail_incorrect_gene_id(self):
-        self.fail_save_diffexpr({'destination_ref': self.getWsName() + '/test_save_error_deseq_diffexp',
+        params = {
+            'destination_ref': self.getWsName() + '/test_save_error_deseq_diffexp',
             'genome_ref': self.genome_ref,
             'tool_used': 'deseq',
             'tool_version': 'deseq_version',
-            'diffexpr_data': [ {'condition_mapping': {'c1': 'c2'},
-                                'diffexpr_filepath': 'data/deseq_output/sig_genes_results_error.csv'},
-                               {'condition_mapping': {'c2': 'c3'},
-                                'diffexpr_filepath': 'data/deseq_output/sig_genes_results_small_23.csv'},
-                               {'condition_mapping': {'c1': 'c3'},
-                                'diffexpr_filepath': 'data/deseq_output/sig_genes_results_small_13.csv'}
-                              ]
-                            },
-            'Gene_id(s) "AT1G79075" is not a known feature in "AT1G79075"')
+            'diffexpr_data':
+                [{'condition_mapping': {'c1': 'c2'},
+                  'diffexpr_filepath': 'data/deseq_output/sig_genes_results_error.csv'}]
+        }
+        with self.assertRaisesRegexp(ValueError, 'not a known feature'):
+            self.getImpl().save_differential_expression_matrix_set(self.ctx, params)
 
     def test_export_diff_expr_matrix_as_tsv(self):
         # upload DiffExpressionMatrix
