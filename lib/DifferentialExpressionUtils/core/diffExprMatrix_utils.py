@@ -351,7 +351,8 @@ class GenDiffExprMatrix:
     @staticmethod
     def get_obj_name(obj_name, condition1, condition2):
         def sanitize(ws_name):
-            return ws_name.replace("\t", " ").translate(string.maketrans(" /", "_|"))
+            # I'm not using translate because it's a mess with mixed unicode & strings
+            return ws_name.replace("\t", " ").replace(" ", "_").replace("/", "|")
 
         return "{}-{}-{}".format(obj_name, sanitize(condition1), sanitize(condition2))
 
