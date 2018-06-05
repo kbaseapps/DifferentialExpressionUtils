@@ -49,9 +49,6 @@ class GenDiffExprMatrix:
 
         self.new_col_names = ['gene_id', 'log2_fold_change', 'p_value', 'q_value']
 
-    def sanitize(self, ws_name):
-        return ws_name.replace("\t", " ").translate(string.maketrans(" /", "_|"))
-
     def get_feature_ids(self, genome_ref):
         """
         _get_feature_ids: get feature ids from genome
@@ -277,7 +274,7 @@ class GenDiffExprMatrix:
 
                 data_matrix = self.gen_cuffdiff_matrix(tsv_file)
 
-                object_name = self.get_obj_name(cond_pair.condition1, cond_pair.condition2)
+                object_name = self.get_obj_name(self.params['obj_name'], cond_pair.condition1, cond_pair.condition2)
                 dem_ref = self.save_diff_expr_matrix(object_name,
                                                      data_matrix,
                                                      cond_pair.condition1,
@@ -351,9 +348,12 @@ class GenDiffExprMatrix:
 
         return twoD_matrix
 
-    def get_obj_name(self, condition1, condition2):
-        return "{}-{}-{}".format(self.params.get('obj_name'),self.sanitize(condition1),
-                                 self.sanitize(condition2))
+    @staticmethod
+    def get_obj_name(obj_name, condition1, condition2):
+        def sanitize(ws_name):
+            return ws_name.replace("\t", " ").translate(string.maketrans(" /", "_|"))
+
+        return "{}-{}-{}".format(obj_name, sanitize(condition1), sanitize(condition2))
 
     def gen_diffexpr_matrices(self, params):
 
@@ -403,7 +403,7 @@ class GenDiffExprMatrix:
                                            delimiter)
 
             condition1, condition2 = condition_mapping.items()[0]
-            object_name = self.get_obj_name(condition1, condition2)
+            object_name = self.get_obj_name(self.params['obj_name'], condition1, condition2)
             dem_ref = self.save_diff_expr_matrix(object_name,
                                                  data_matrix,
                                                  condition1,

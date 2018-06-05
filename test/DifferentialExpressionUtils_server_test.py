@@ -22,6 +22,7 @@ from GenomeFileUtil.GenomeFileUtilClient import GenomeFileUtil
 from DifferentialExpressionUtils.DifferentialExpressionUtilsImpl import DifferentialExpressionUtils
 from DifferentialExpressionUtils.DifferentialExpressionUtilsServer import MethodContext
 from DifferentialExpressionUtils.authclient import KBaseAuth as _KBaseAuth
+from DifferentialExpressionUtils.core.diffExprMatrix_utils import GenDiffExprMatrix
 
 class DifferentialExpressionUtilsTest(unittest.TestCase):
 
@@ -327,6 +328,13 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                     'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
                                     },
                                     'tool_version parameter is required')
+
+    def test_make_object_id(self):
+        self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'foo', 'bar'), "meh-foo-bar")
+        self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'foo/1', 'bar 1'),
+                         "meh-foo|1-bar_1")
+        self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'foo\t1', 'bar 1'),
+                         "meh-foo_1-bar_1")
 
     def fail_save_diffexpr(self, params, error, exception=ValueError, do_startswith=False):
 
