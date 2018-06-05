@@ -1,19 +1,18 @@
-import os
 import csv
-import uuid
 import errno
+import os
 import re
-from pprint import pprint
-from datetime import datetime
+import string
+import uuid
 from collections import namedtuple
+from datetime import datetime
 
-from Workspace.WorkspaceClient import Workspace as Workspace
 from DataFileUtil.DataFileUtilClient import DataFileUtil
-from DataFileUtil.baseclient import ServerError as DFUError
+from GenomeSearchUtil.GenomeSearchUtilClient import GenomeSearchUtil
 from KBaseFeatureValues.KBaseFeatureValuesClient import KBaseFeatureValues
 from SetAPI.SetAPIClient import SetAPI
+from Workspace.WorkspaceClient import Workspace as Workspace
 
-from GenomeSearchUtil.GenomeSearchUtilClient import GenomeSearchUtil
 
 class GenDiffExprMatrix:
 
@@ -49,9 +48,6 @@ class GenDiffExprMatrix:
     def setup_data(self):
 
         self.new_col_names = ['gene_id', 'log2_fold_change', 'p_value', 'q_value']
-
-    def sanitize(self, ws_name):
-        return ws_name
 
     def get_feature_ids(self, genome_ref):
         """
@@ -278,9 +274,7 @@ class GenDiffExprMatrix:
 
                 data_matrix = self.gen_cuffdiff_matrix(tsv_file)
 
-                object_name = self.params.get('obj_name') + '_' + \
-                                               self.sanitize(cond_pair.condition1) + '_' + \
-                                               self.sanitize(cond_pair.condition2)
+                object_name = self.get_obj_name(self.params['obj_name'], cond_pair.condition1, cond_pair.condition2)
                 dem_ref = self.save_diff_expr_matrix(object_name,
                                                      data_matrix,
                                                      cond_pair.condition1,
@@ -325,9 +319,8 @@ class GenDiffExprMatrix:
                     if match:
                         row_names.append(row[in_col_names[0]])
                     else:
-                        error_msg = 'Gene_id(s) "{}" is not a known feature in "{}"'.\
-                                            format(', '.join(mismatched_gene_ids),
-                                                    row[in_col_names[0]])
+                        error_msg = 'Gene_id(s) "{}" is not a known feature in "{}"'.format(
+                            ', '.join(mismatched_gene_ids), self.params.get('genome_ref'))
                         raise ValueError(error_msg)
                 try:
                     values.append([float(row[v]) for v in in_col_names[1:]])
@@ -355,9 +348,12 @@ class GenDiffExprMatrix:
 
         return twoD_matrix
 
-    def get_obj_name(self, condition1, condition2):
+    @staticmethod
+    def get_obj_name(obj_name, condition1, condition2):
+        def sanitize(ws_name):
+            return ws_name.replace("\t", " ").translate(string.maketrans(" /", "_|"))
 
-        return self.params.get('obj_name') + '_' + condition1 + '_' + condition2
+        return "{}-{}-{}".format(obj_name, sanitize(condition1), sanitize(condition2))
 
     def gen_diffexpr_matrices(self, params):
 
@@ -407,7 +403,7 @@ class GenDiffExprMatrix:
                                            delimiter)
 
             condition1, condition2 = condition_mapping.items()[0]
-            object_name = self.get_obj_name(condition1, condition2)
+            object_name = self.get_obj_name(self.params['obj_name'], condition1, condition2)
             dem_ref = self.save_diff_expr_matrix(object_name,
                                                  data_matrix,
                                                  condition1,

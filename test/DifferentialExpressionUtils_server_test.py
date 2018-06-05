@@ -22,6 +22,7 @@ from GenomeFileUtil.GenomeFileUtilClient import GenomeFileUtil
 from DifferentialExpressionUtils.DifferentialExpressionUtilsImpl import DifferentialExpressionUtils
 from DifferentialExpressionUtils.DifferentialExpressionUtilsServer import MethodContext
 from DifferentialExpressionUtils.authclient import KBaseAuth as _KBaseAuth
+from DifferentialExpressionUtils.core.diffExprMatrix_utils import GenDiffExprMatrix
 
 class DifferentialExpressionUtilsTest(unittest.TestCase):
 
@@ -93,8 +94,6 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         cls.genome_ref = cls.gfu.genbank_to_genome({'file': {'path': genbank_file_path},
                                                     'workspace_name': cls.wsName,
                                                     'genome_name': genome_object_name,
-                                                    'source': 'Ensembl',
-                                                    'generate_ids_if_needed': 1,
                                                     'generate_missing_genes': 1
                                                     })['genome_ref']
 
@@ -330,11 +329,18 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                     },
                                     'tool_version parameter is required')
 
+    def test_make_object_id(self):
+        self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'foo', 'bar'), "meh-foo-bar")
+        self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'foo/1', 'bar 1'),
+                         "meh-foo|1-bar_1")
+        self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'foo\t1', 'bar 1'),
+                         "meh-foo_1-bar_1")
+
     def fail_save_diffexpr(self, params, error, exception=ValueError, do_startswith=False):
 
         test_name = inspect.stack()[1][3]
         print('\n******** starting expected save fail test: ' + test_name + ' *********')
-        print('-------------------------------------------------------------------------------------')
+        print('----------------------------------------------------------------------------------')
 
         with self.assertRaises(exception) as context:
             self.getImpl().save_differential_expression_matrix_set(self.ctx, params)
@@ -347,19 +353,17 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
             self.assertEqual(error, str(context.exception.message))
 
     def test_save_fail_incorrect_gene_id(self):
-        self.fail_save_diffexpr({'destination_ref': self.getWsName() + '/test_save_error_deseq_diffexp',
+        params = {
+            'destination_ref': self.getWsName() + '/test_save_error_deseq_diffexp',
             'genome_ref': self.genome_ref,
             'tool_used': 'deseq',
             'tool_version': 'deseq_version',
-            'diffexpr_data': [ {'condition_mapping': {'c1': 'c2'},
-                                'diffexpr_filepath': 'data/deseq_output/sig_genes_results_error.csv'},
-                               {'condition_mapping': {'c2': 'c3'},
-                                'diffexpr_filepath': 'data/deseq_output/sig_genes_results_small_23.csv'},
-                               {'condition_mapping': {'c1': 'c3'},
-                                'diffexpr_filepath': 'data/deseq_output/sig_genes_results_small_13.csv'}
-                              ]
-                            },
-            'Gene_id(s) "AT1G79075" is not a known feature in "AT1G79075"')
+            'diffexpr_data':
+                [{'condition_mapping': {'c1': 'c2'},
+                  'diffexpr_filepath': 'data/deseq_output/sig_genes_results_error.csv'}]
+        }
+        with self.assertRaisesRegexp(ValueError, 'not a known feature'):
+            self.getImpl().save_differential_expression_matrix_set(self.ctx, params)
 
     def test_export_diff_expr_matrix_as_tsv(self):
         # upload DiffExpressionMatrix
