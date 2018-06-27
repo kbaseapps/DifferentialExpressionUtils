@@ -253,25 +253,25 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                    },
                                    'Object name or id is required in destination_ref')
 
-    def test_upload_fail_bad_wsname(self):
-        self.fail_upload_diffexpr({
-                                    'destination_ref': '&bad' + '/foo',
-                                    'genome_ref': self.genome_ref,
-                                    'tool_used': 'cuffdiff',
-                                    'tool_version': '2.2.1',
-                                    'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
-                                  },
-                                  'Illegal character in workspace name &bad: &')
-
-    def test_upload_fail_non_existant_wsname(self):
-        self.fail_upload_diffexpr({
-                                    'destination_ref': '1s' + '/foo',
-                                    'genome_ref': self.genome_ref,
-                                    'tool_used': 'cuffdiff',
-                                    'tool_version': '2.2.1',
-                                    'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
-                                  },
-                                  'No workspace with name 1s exists')
+#    def test_upload_fail_bad_wsname(self):
+#        self.fail_upload_diffexpr({
+#                                    'destination_ref': '&bad' + '/foo',
+#                                    'genome_ref': self.genome_ref,
+#                                    'tool_used': 'cuffdiff',
+#                                    'tool_version': '2.2.1',
+#                                    'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
+#                                  },
+#                                  'Illegal character in workspace name &bad: &')
+#
+#    def test_upload_fail_non_existant_wsname(self):
+#        self.fail_upload_diffexpr({
+#                                    'destination_ref': '1s' + '/foo',
+#                                    'genome_ref': self.genome_ref,
+#                                    'tool_used': 'cuffdiff',
+#                                    'tool_version': '2.2.1',
+#                                    'diffexpr_filepath': 'data/cuffdiff_output_3conditions/gene_exp.diff'
+#                                  },
+#                                  'No workspace with name 1s exists')
 
     def test_upload_fail_no_diffexpr_filepath(self):
         self.fail_upload_diffexpr({
@@ -382,6 +382,8 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                       'type': 'log2_level',
                                       'scale': '1.0'}
 
+        print "#### self.wsName {0}\n".format( self.wsName )
+        print "#### id {0}\n".format( self.dfu.ws_name_to_id( self.wsName ) )
         save_object_params = {
             'id': self.dfu.ws_name_to_id(self.wsName),
             'objects': [{'type': 'KBaseFeatureValues.DifferentialExpressionMatrix',
