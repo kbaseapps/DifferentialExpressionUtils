@@ -6,6 +6,7 @@ import string
 import uuid
 from collections import namedtuple
 from datetime import datetime
+from numpy import log2
 
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from GenomeSearchUtil.GenomeSearchUtilClient import GenomeSearchUtil
@@ -13,6 +14,7 @@ from KBaseFeatureValues.KBaseFeatureValuesClient import KBaseFeatureValues
 from SetAPI.SetAPIClient import SetAPI
 from Workspace.WorkspaceClient import Workspace as Workspace
 
+from pprint import pprint, pformat
 
 class GenDiffExprMatrix:
 
@@ -177,16 +179,32 @@ class GenDiffExprMatrix:
         return res.get('set_ref')
 
 
+    # 
+    # ballgown always outputs a linear fold change, which we need to convert to log2 
+    # before storing
+    #
+
+    def safely_apply_log2_to_fc( self, row ):
+       if row[0]:                                                                   
+           fc = row[0]                                                              
+           if fc < 1.0e-10:                                                         
+               fc = fc + 1.0e-10   # incase fc is zero                              
+           return( [ log2( fc ) ] + row[1:] )                                       
+       else:                                                                        
+           return( row ) 
+
     def process_ballgown_file(self, diffexpr_filepath):
 
         ballgown_col_names = ['id', 'fc', 'pval', 'qval']
-
+        
         data_matrix = self.gen_matrix(diffexpr_filepath,
                                       ballgown_col_names,
                                       delimiter='\t')
+        log2_data_matrix = data_matrix
+        log2_data_matrix['values'] = map( self.safely_apply_log2_to_fc, data_matrix.get( 'values' ) )
 
         dem_ref = self.save_diff_expr_matrix(self.params.get('obj_name')+'_0',
-                                             data_matrix, None, None)
+                                             log2_data_matrix, None, None)
         set_items = [{
                     'label': 'global Differential Expression Data',
                     'ref': dem_ref

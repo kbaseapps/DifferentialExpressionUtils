@@ -382,6 +382,8 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                       'type': 'log2_level',
                                       'scale': '1.0'}
 
+        print("#### self.wsName {0}\n".format( self.wsName ))
+        print("#### id {0}\n".format( self.dfu.ws_name_to_id( self.wsName ) ))
         save_object_params = {
             'id': self.dfu.ws_name_to_id(self.wsName),
             'objects': [{'type': 'KBaseFeatureValues.DifferentialExpressionMatrix',
