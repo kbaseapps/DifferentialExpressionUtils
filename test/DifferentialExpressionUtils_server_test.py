@@ -16,9 +16,9 @@ except:
 
 from pprint import pprint  # noqa: F401
 
-from biokbase.workspace.client import Workspace as workspaceService
-from DataFileUtil.DataFileUtilClient import DataFileUtil
-from GenomeFileUtil.GenomeFileUtilClient import GenomeFileUtil
+from installed_clients.WorkspaceClient import Workspace as workspaceService
+from installed_clients.DataFileUtilClient import DataFileUtil
+from installed_clients.GenomeFileUtilClient import GenomeFileUtil
 from DifferentialExpressionUtils.DifferentialExpressionUtilsImpl import DifferentialExpressionUtils
 from DifferentialExpressionUtils.DifferentialExpressionUtilsServer import MethodContext
 from DifferentialExpressionUtils.authclient import KBaseAuth as _KBaseAuth
@@ -330,11 +330,11 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                     'tool_version parameter is required')
 
     def test_make_object_id(self):
-        self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'foo', 'bar'), "meh-foo-bar")
+        self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'foo', 'bar'), "meh-bar-VS-foo")
         self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'foo/1', 'bar 1'),
-                         "meh-foo|1-bar_1")
+                         "meh-bar_1-VS-foo|1")
         self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'foo\t1', 'bar 1'),
-                         "meh-foo_1-bar_1")
+                         "meh-bar_1-VS-foo_1")
 
     def fail_save_diffexpr(self, params, error, exception=ValueError, do_startswith=False):
 

@@ -2,19 +2,16 @@ import csv
 import errno
 import os
 import re
-import string
 import uuid
 from collections import namedtuple
 from datetime import datetime
 from numpy import log2
 
-from DataFileUtil.DataFileUtilClient import DataFileUtil
-from GenomeSearchUtil.GenomeSearchUtilClient import GenomeSearchUtil
-from KBaseFeatureValues.KBaseFeatureValuesClient import KBaseFeatureValues
-from SetAPI.SetAPIClient import SetAPI
-from Workspace.WorkspaceClient import Workspace as Workspace
-
-from pprint import pprint, pformat
+from installed_clients.DataFileUtilClient import DataFileUtil
+from installed_clients.GenomeSearchUtilClient import GenomeSearchUtil
+from installed_clients.KBaseFeatureValuesClient import KBaseFeatureValues
+from installed_clients.SetAPIClient import SetAPI
+from installed_clients.WorkspaceClient import Workspace as Workspace
 
 class GenDiffExprMatrix:
 
@@ -112,7 +109,7 @@ class GenDiffExprMatrix:
                     if log2fc > maxvalue:
                         maxvalue = log2fc
 
-            print 'maxvalue: ', maxvalue
+            print('maxvalue: ', maxvalue)
             return maxvalue
 
     def gen_cuffdiff_matrix(self, infile, delimiter='\t'):
@@ -286,8 +283,8 @@ class GenDiffExprMatrix:
 
             set_items = list()
             for cond_pair, file_info in condPair_fileInfo.iteritems():
-                print 'Cond_pair: ', cond_pair
-                print 'File: ', file_info.file_path
+                print('Cond_pair: ', cond_pair)
+                print('File: ', file_info.file_path)
                 tsv_file = file_info.file_path
 
                 data_matrix = self.gen_cuffdiff_matrix(tsv_file)
@@ -372,7 +369,7 @@ class GenDiffExprMatrix:
             # I'm not using translate because it's a mess with mixed unicode & strings
             return ws_name.replace("\t", " ").replace(" ", "_").replace("/", "|")
 
-        return "{}-{}-{}".format(obj_name, sanitize(condition1), sanitize(condition2))
+        return "{}-{}-VS-{}".format(obj_name, sanitize(condition2), sanitize(condition1))
 
     def gen_diffexpr_matrices(self, params):
 
