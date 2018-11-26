@@ -10,10 +10,10 @@ import errno
 from pprint import pprint
 from pprint import pformat
 
-from DataFileUtil.DataFileUtilClient import DataFileUtil
-from DataFileUtil.baseclient import ServerError as DFUError
-from Workspace.WorkspaceClient import Workspace
-from Workspace.baseclient import ServerError as WorkspaceError
+from installed_clients.DataFileUtilClient import DataFileUtil
+from installed_clients.baseclient import ServerError as DFUError
+from installed_clients.WorkspaceClient import Workspace
+from installed_clients.baseclient import ServerError as WorkspaceError
 from core.diffExprMatrix_utils import GenDiffExprMatrix
 #END_HEADER
 

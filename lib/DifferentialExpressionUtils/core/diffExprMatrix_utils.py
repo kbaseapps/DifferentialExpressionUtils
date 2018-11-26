@@ -7,11 +7,11 @@ from collections import namedtuple
 from datetime import datetime
 from numpy import log2
 
-from DataFileUtil.DataFileUtilClient import DataFileUtil
-from GenomeSearchUtil.GenomeSearchUtilClient import GenomeSearchUtil
-from KBaseFeatureValues.KBaseFeatureValuesClient import KBaseFeatureValues
-from SetAPI.SetAPIClient import SetAPI
-from Workspace.WorkspaceClient import Workspace as Workspace
+from installed_clients.DataFileUtilClient import DataFileUtil
+from installed_clients.GenomeSearchUtilClient import GenomeSearchUtil
+from installed_clients.KBaseFeatureValuesClient import KBaseFeatureValues
+from installed_clients.SetAPIClient import SetAPI
+from installed_clients.WorkspaceClient import Workspace as Workspace
 
 class GenDiffExprMatrix:
 
