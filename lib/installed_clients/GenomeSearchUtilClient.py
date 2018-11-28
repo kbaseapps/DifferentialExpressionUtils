@@ -12,10 +12,9 @@ from __future__ import print_function
 try:
     # baseclient and this client are in a package
     from .baseclient import BaseClient as _BaseClient  # @UnusedImport
-except:
+except ImportError:
     # no they aren't
     from baseclient import BaseClient as _BaseClient  # @Reimport
-import time
 
 
 class GenomeSearchUtil(object):
@@ -39,14 +38,6 @@ class GenomeSearchUtil(object):
             async_job_check_time_ms=async_job_check_time_ms,
             async_job_check_time_scale_percent=async_job_check_time_scale_percent,
             async_job_check_max_time_ms=async_job_check_max_time_ms)
-
-    def _check_job(self, job_id):
-        return self._client._check_job('GenomeSearchUtil', job_id)
-
-    def _search_submit(self, params, context=None):
-        return self._client._submit_job(
-             'GenomeSearchUtil.search', [params],
-             self._service_ver, context)
 
     def search(self, params, context=None):
         """
@@ -88,22 +79,8 @@ class GenomeSearchUtil(object):
            Long, parameter "ontology_terms" of mapping from String to String,
            parameter "num_found" of Long
         """
-        job_id = self._search_submit(params, context)
-        async_job_check_time = self._client.async_job_check_time
-        while True:
-            time.sleep(async_job_check_time)
-            async_job_check_time = (async_job_check_time *
-                self._client.async_job_check_time_scale_percent / 100.0)
-            if async_job_check_time > self._client.async_job_check_max_time:
-                async_job_check_time = self._client.async_job_check_max_time
-            job_state = self._check_job(job_id)
-            if job_state['finished']:
-                return job_state['result'][0]
-
-    def _search_region_submit(self, params, context=None):
-        return self._client._submit_job(
-             'GenomeSearchUtil.search_region', [params],
-             self._service_ver, context)
+        return self._client.run_job('GenomeSearchUtil.search', [params],
+                                    self._service_ver, context)
 
     def search_region(self, params, context=None):
         """
@@ -142,22 +119,8 @@ class GenomeSearchUtil(object):
            parameter "ontology_terms" of mapping from String to String,
            parameter "num_found" of Long
         """
-        job_id = self._search_region_submit(params, context)
-        async_job_check_time = self._client.async_job_check_time
-        while True:
-            time.sleep(async_job_check_time)
-            async_job_check_time = (async_job_check_time *
-                self._client.async_job_check_time_scale_percent / 100.0)
-            if async_job_check_time > self._client.async_job_check_max_time:
-                async_job_check_time = self._client.async_job_check_max_time
-            job_state = self._check_job(job_id)
-            if job_state['finished']:
-                return job_state['result'][0]
-
-    def _search_contigs_submit(self, params, context=None):
-        return self._client._submit_job(
-             'GenomeSearchUtil.search_contigs', [params],
-             self._service_ver, context)
+        return self._client.run_job('GenomeSearchUtil.search_region', [params],
+                                    self._service_ver, context)
 
     def search_contigs(self, params, context=None):
         """
@@ -183,28 +146,9 @@ class GenomeSearchUtil(object):
            parameter "contig_id" of String, parameter "length" of Long,
            parameter "feature_count" of Long, parameter "num_found" of Long
         """
-        job_id = self._search_contigs_submit(params, context)
-        async_job_check_time = self._client.async_job_check_time
-        while True:
-            time.sleep(async_job_check_time)
-            async_job_check_time = (async_job_check_time *
-                self._client.async_job_check_time_scale_percent / 100.0)
-            if async_job_check_time > self._client.async_job_check_max_time:
-                async_job_check_time = self._client.async_job_check_max_time
-            job_state = self._check_job(job_id)
-            if job_state['finished']:
-                return job_state['result'][0]
+        return self._client.run_job('GenomeSearchUtil.search_contigs', [params],
+                                    self._service_ver, context)
 
     def status(self, context=None):
-        job_id = self._client._submit_job('GenomeSearchUtil.status', 
-            [], self._service_ver, context)
-        async_job_check_time = self._client.async_job_check_time
-        while True:
-            time.sleep(async_job_check_time)
-            async_job_check_time = (async_job_check_time *
-                self._client.async_job_check_time_scale_percent / 100.0)
-            if async_job_check_time > self._client.async_job_check_max_time:
-                async_job_check_time = self._client.async_job_check_max_time
-            job_state = self._check_job(job_id)
-            if job_state['finished']:
-                return job_state['result'][0]
+        return self._client.run_job('GenomeSearchUtil.status', [],
+                                    self._service_ver, context)
