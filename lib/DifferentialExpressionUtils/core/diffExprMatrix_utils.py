@@ -7,6 +7,8 @@ from collections import namedtuple
 from datetime import datetime
 from numpy import log2
 
+import requests.utils
+
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.GenomeSearchUtilClient import GenomeSearchUtil
 from installed_clients.KBaseFeatureValuesClient import KBaseFeatureValues
@@ -320,10 +322,11 @@ class GenDiffExprMatrix:
             row_names = []
             values = []
             for row in rdr:
-                if row[in_col_names[0]] in feature_ids:
-                    row_names.append(row[in_col_names[0]])
+                name = requests.utils.unquote(row[in_col_names[0]])
+                if name in feature_ids:
+                    row_names.append(name)
                 else:
-                    gene_ids = row[in_col_names[0]].strip().split(',')
+                    gene_ids = name.strip().split(',')
                     match = True
                     mismatched_gene_ids = list()
                     for gene_id in gene_ids:
@@ -332,7 +335,7 @@ class GenDiffExprMatrix:
                             mismatched_gene_ids.append(gene_id)
                             match = False
                     if match:
-                        row_names.append(row[in_col_names[0]])
+                        row_names.append(name)
                     else:
                         error_msg = 'Gene_id(s) "{}" is not a known feature in "{}"'.format(
                             ', '.join(mismatched_gene_ids), self.params.get('genome_ref'))
