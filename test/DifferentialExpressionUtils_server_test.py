@@ -1,28 +1,26 @@
 # -*- coding: utf-8 -*-
-import unittest
-import os  # noqa: F401
-import time
-import shutil
-import inspect
-import uuid
 import hashlib
-import requests
-
+import inspect
+import os  # noqa: F401
+import shutil
+import time
+import unittest
+import uuid
+from configparser import ConfigParser
 from os import environ
-try:
-    from ConfigParser import ConfigParser  # py2
-except:
-    from configparser import ConfigParser  # py3
+from pprint import pformat  # noqa: F401
+import logging
 
-from pprint import pprint  # noqa: F401
+import requests
+from DifferentialExpressionUtils.authclient import KBaseAuth as _KBaseAuth
 
-from installed_clients.WorkspaceClient import Workspace as workspaceService
-from installed_clients.DataFileUtilClient import DataFileUtil
-from installed_clients.GenomeFileUtilClient import GenomeFileUtil
 from DifferentialExpressionUtils.DifferentialExpressionUtilsImpl import DifferentialExpressionUtils
 from DifferentialExpressionUtils.DifferentialExpressionUtilsServer import MethodContext
-from DifferentialExpressionUtils.authclient import KBaseAuth as _KBaseAuth
 from DifferentialExpressionUtils.core.diffExprMatrix_utils import GenDiffExprMatrix
+from installed_clients.DataFileUtilClient import DataFileUtil
+from installed_clients.GenomeFileUtilClient import GenomeFileUtil
+from installed_clients.WorkspaceClient import Workspace as workspaceService
+
 
 class DifferentialExpressionUtilsTest(unittest.TestCase):
 
@@ -65,11 +63,9 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-
         if hasattr(cls, 'wsName'):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
-
 
     def getWsClient(self):
         return self.__class__.wsClient
@@ -114,9 +110,9 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         obj = self.dfu.get_objects(
             {'object_refs': [retVal.get('diffExprMatrixSet_ref')]})['data'][0]
 
-        print("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
-        pprint(obj)
-        print("=====================================================================")
+        logging.info("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
+        logging.info(pformat(obj))
+        logging.info("=====================================================================")
 
     #@unittest.skip("skipped test_upload_deseq_differentialExpression")
     def test_upload_deseq_differentialExpression(self):
@@ -133,9 +129,9 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         obj = self.dfu.get_objects(
             {'object_refs': [retVal.get('diffExprMatrixSet_ref')]})['data'][0]
 
-        print("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
-        pprint(obj)
-        print("=====================================================================")
+        logging.info("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
+        logging.info(pformat(obj))
+        logging.info("=====================================================================")
 
 
     #@unittest.skip("skipped test_upload_ballgown_differentialExpression")
@@ -150,15 +146,15 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                   }
         retVal = self.getImpl().upload_differentialExpression(self.ctx, params)[0]
 
-        print('BALL GOWN TEST RETVAL')
-        pprint(retVal)
+        logging.info('BALL GOWN TEST RETVAL')
+        logging.info(pformat(retVal))
 
         obj = self.dfu.get_objects(
             {'object_refs': [retVal.get('diffExprMatrixSet_ref')]})['data'][0]
 
-        print("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
-        pprint(obj)
-        print("=====================================================================")
+        logging.info("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
+        logging.info(pformat(obj))
+        logging.info("=====================================================================")
 
     #@unittest.skip("skipped test_save_deseq_differentialExpression")
     def test_save_deseq_differentialExpression(self):
@@ -180,9 +176,9 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         obj = self.dfu.get_objects(
             {'object_refs': [retVal.get('diffExprMatrixSet_ref')]})['data'][0]
 
-        print("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
-        pprint(obj)
-        print("=====================================================================")
+        logging.info("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
+        logging.info(pformat(obj))
+        logging.info("=====================================================================")
 
     @unittest.skip("skipped test_save_cuffdiff_differentialExpression")
     def test_save_cuffdiff_differentialExpression(self):
@@ -204,25 +200,18 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         obj = self.dfu.get_objects(
             {'object_refs': [retVal.get('diffExprMatrixSet_ref')]})['data'][0]
 
-        print("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
-        pprint(obj)
-        print("=====================================================================")
+        logging.info("============ DIFFERENTIAL EXPRESSION MATRIX SET OUTPUT ==============")
+        logging.info(pformat(obj))
+        logging.info("=====================================================================")
 
     def fail_upload_diffexpr(self, params, error, exception=ValueError, do_startswith=False):
 
-        test_name = inspect.stack()[1][3]
-        print('\n******** starting expected upload fail test: ' + test_name + ' *********')
-        print('-------------------------------------------------------------------------------------')
-
-        with self.assertRaises(exception) as context:
-            self.getImpl().upload_differentialExpression(self.ctx, params)
         if do_startswith:
-            self.assertTrue(str(context.exception.message).startswith(error),
-                            "Error message {} does not start with {}".format(
-                                str(context.exception.message),
-                                error))
+            error = f'^{error}'
         else:
-            self.assertEqual(error, str(context.exception.message))
+            error = f'^{error}$'
+        with self.assertRaisesRegexp(exception, error) as context:
+            self.getImpl().upload_differentialExpression(self.ctx, params)
 
     def test_upload_fail_no_dst_ref(self):
         self.fail_upload_diffexpr({
@@ -338,10 +327,6 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
 
     def fail_save_diffexpr(self, params, error, exception=ValueError, do_startswith=False):
 
-        test_name = inspect.stack()[1][3]
-        print('\n******** starting expected save fail test: ' + test_name + ' *********')
-        print('----------------------------------------------------------------------------------')
-
         with self.assertRaises(exception) as context:
             self.getImpl().save_differential_expression_matrix_set(self.ctx, params)
         if do_startswith:
@@ -362,7 +347,7 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                 [{'condition_mapping': {'c1': 'c2'},
                   'diffexpr_filepath': 'data/deseq_output/sig_genes_results_error.csv'}]
         }
-        with self.assertRaisesRegexp(ValueError, 'not a known feature'):
+        with self.assertRaisesRegex(ValueError, 'not a known feature'):
             self.getImpl().save_differential_expression_matrix_set(self.ctx, params)
 
     def test_export_diff_expr_matrix_as_tsv(self):
@@ -382,8 +367,8 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
                                       'type': 'log2_level',
                                       'scale': '1.0'}
 
-        print("#### self.wsName {0}\n".format( self.wsName ))
-        print("#### id {0}\n".format( self.dfu.ws_name_to_id( self.wsName ) ))
+        print(("#### self.wsName {0}\n".format( self.wsName )))
+        print(("#### id {0}\n".format( self.dfu.ws_name_to_id( self.wsName ) )))
         save_object_params = {
             'id': self.dfu.ws_name_to_id(self.wsName),
             'objects': [{'type': 'KBaseFeatureValues.DifferentialExpressionMatrix',
@@ -414,10 +399,10 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
         md5 = hashlib.md5(open(os.path.join(zipdir, file_name), 'rb')
                           .read()).hexdigest()
 
-        expect_md5 = '3ac17d2f525b98c6bd2fef88a14e6f23'
+        expect_md5 = '4d98fb6e3e1744a86e289735644d51b4'
         self.assertEqual(md5, expect_md5)
 
         header = {'Authorization': 'Oauth {0}'.format(self.token)}
         requests.delete(self.shockURL + '/node/' + shocknode, headers=header,
                         allow_redirects=True)
-        print('Deleted shock node ' + shocknode)
+        logging.info('Deleted shock node ' + shocknode)
