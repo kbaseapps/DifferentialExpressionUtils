@@ -3,6 +3,7 @@ import errno
 import logging
 import os
 import re
+import string
 import uuid
 from collections import namedtuple
 from datetime import datetime
@@ -364,8 +365,10 @@ class GenDiffExprMatrix:
     @staticmethod
     def get_obj_name(obj_name, condition1, condition2):
         def sanitize(ws_name):
-            # I'm not using translate because it's a mess with mixed unicode & strings
-            return ws_name.replace("\t", " ").replace(" ", "_").replace("/", "|")
+            """Translates some invalid characters when we can,  strips the rest"""
+            trans_dict = str.maketrans({"\t": "_", " ": "_", "/": "|"})
+            permited_char = set(string.ascii_letters + string.digits + "_-.|")
+            return "".join((x for x in ws_name.translate(trans_dict) if x in permited_char))
 
         return "{}-{}-VS-{}".format(obj_name, sanitize(condition2), sanitize(condition1))
 

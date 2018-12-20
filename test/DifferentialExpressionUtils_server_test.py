@@ -320,9 +320,9 @@ class DifferentialExpressionUtilsTest(unittest.TestCase):
 
     def test_make_object_id(self):
         self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'foo', 'bar'), "meh-bar-VS-foo")
-        self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'foo/1', 'bar 1'),
+        self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'f(oo/1', 'ba]r 1'),
                          "meh-bar_1-VS-foo|1")
-        self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'foo\t1', 'bar 1'),
+        self.assertEqual(GenDiffExprMatrix.get_obj_name('meh', 'fo*o\t1', 'ba$r 1'),
                          "meh-bar_1-VS-foo_1")
 
     def fail_save_diffexpr(self, params, error, exception=ValueError, do_startswith=False):
