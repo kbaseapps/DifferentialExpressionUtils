@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
-import os
-import time
-import glob
-from datetime import datetime
-import uuid
 import errno
-
-from pprint import pprint
+import glob
+import logging
+import os
+import uuid
+from datetime import datetime
 from pprint import pformat
+from pprint import pprint
 
+from DifferentialExpressionUtils.core.diffExprMatrix_utils import GenDiffExprMatrix
 from installed_clients.DataFileUtilClient import DataFileUtil
-from installed_clients.baseclient import ServerError as DFUError
 from installed_clients.WorkspaceClient import Workspace
-from installed_clients.baseclient import ServerError as WorkspaceError
-from core.diffExprMatrix_utils import GenDiffExprMatrix
+from installed_clients.baseclient import ServerError as DFUError
 #END_HEADER
 
 
@@ -49,10 +47,6 @@ class DifferentialExpressionUtils:
     PARAM_IN_DIFFEXP_FILEPATH = 'diffexpr_filepath'
     PARAM_IN_DIFFEXP_DATA = 'diffexpr_data'
 
-    def log(self, message, prefix_newline=False):
-        print(('\n' if prefix_newline else '') +
-              str(time.time()) + ': ' + message)
-
     def _check_required_param(self, in_params, param_list):
         """
         Check if each of the params in the list are in the input params
@@ -83,7 +77,7 @@ class DifferentialExpressionUtils:
                 prefix = se.message.split('.')[0]
                 raise ValueError(prefix)
 
-        self.log('Obtained workspace name/id ' + str(ws_id))
+        logging.info('Obtained workspace name/id ' + str(ws_id))
 
         return ws_name, ws_id, obj_name_id
 
@@ -131,13 +125,7 @@ class DifferentialExpressionUtils:
     def _get_ws_info(self, obj_ref):
 
         ws = Workspace(self.ws_url)
-        try:
-            info = ws.get_object_info_new({'objects': [{'ref': obj_ref}]})[0]
-        except WorkspaceError as wse:
-            self.log('Logging workspace exception')
-            self.log(str(wse))
-            raise
-        return info
+        return ws.get_object_info_new({'objects': [{'ref': obj_ref}]})[0]
 
     #END_CLASS_HEADER
 
@@ -152,6 +140,8 @@ class DifferentialExpressionUtils:
         self.ws_client = Workspace(self.ws_url)
         self.dfu = DataFileUtil(self.callback_url)
         self.demu = GenDiffExprMatrix(config)
+        logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
+                            level=logging.INFO)
         #END_CONSTRUCTOR
         pass
 
@@ -183,7 +173,7 @@ class DifferentialExpressionUtils:
         # return variables are: returnVal
         #BEGIN upload_differentialExpression
 
-        self.log('Starting upload differential expression, parsing parameters ')
+        logging.info('Starting upload differential expression, parsing parameters ')
         pprint(params)
 
         ws_name, ws_id, obj_name_id = self._proc_upload_diffexpr_params(ctx, params)
@@ -196,7 +186,7 @@ class DifferentialExpressionUtils:
 
         demset_ref = self.demu.gen_diffexpr_matrices(params)
 
-        self.log('Differential Expression Matrix set ref: ')
+        logging.info('Differential Expression Matrix set ref: ')
         pprint(demset_ref)
 
         returnVal = {'diffExprMatrixSet_ref': demset_ref}
@@ -243,7 +233,7 @@ class DifferentialExpressionUtils:
         # return variables are: returnVal
         #BEGIN save_differential_expression_matrix_set
 
-        self.log('Starting save differential expression matrix set, parsing parameters ')
+        logging.info('Starting save differential expression matrix set, parsing parameters ')
         pprint(params)
 
         ws_name, ws_id, obj_name_id = self._proc_save_diffexpr_params(ctx, params)
@@ -256,7 +246,7 @@ class DifferentialExpressionUtils:
 
         demset_ref = self.demu.save_diffexpr_matrices(params)
 
-        self.log('Differential Expression Matrix set ref: ')
+        logging.info('Differential Expression Matrix set ref: ')
         pprint(demset_ref)
 
         returnVal = {'diffExprMatrixSet_ref': demset_ref}
@@ -291,18 +281,14 @@ class DifferentialExpressionUtils:
         # return variables are: returnVal
         #BEGIN download_differentialExpression
 
-        self.log('Running download_differentialExpression with params:\n' +
+        logging.info('Running download_differentialExpression with params:\n' +
                  pformat(params))
 
         inref = params.get(self.PARAM_IN_SRC_REF)
         if not inref:
             raise ValueError('{} parameter is required'.format(self.PARAM_IN_SRC_REF))
 
-        try:
-            expression = self.dfu.get_objects({'object_refs': [inref]})['data']
-        except DFUError as e:
-            self.log('Logging stacktrace from workspace exception:\n' + e.data)
-            raise
+        expression = self.dfu.get_objects({'object_refs': [inref]})['data']
 
         # set the output dir
         timestamp = int((datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds() * 1000)
@@ -352,11 +338,7 @@ class DifferentialExpressionUtils:
         if not inref:
             raise ValueError(self.PARAM_IN_SRC_REF + ' parameter is required')
 
-        try:
-            expression = self.dfu.get_objects({'object_refs': [inref]})['data']
-        except DFUError as e:
-            self.log('Logging stacktrace from workspace exception:\n' + e.data)
-            raise
+        expression = self.dfu.get_objects({'object_refs': [inref]})['data']
 
         output = {'shock_id': expression[0]['data']['file']['id']}
 
@@ -381,18 +363,14 @@ class DifferentialExpressionUtils:
         # return variables are: returnVal
         #BEGIN export_diff_expr_matrix_as_tsv
 
-        self.log('Running export_diff_expr_matrix_as_tsv with params:\n' +
+        logging.info('Running export_diff_expr_matrix_as_tsv with params:\n' +
                  pformat(params))
 
         inref = params.get('input_ref')
         if not inref:
             raise ValueError('{} parameter is required'.format('input_ref'))
 
-        try:
-            diff_expr_obj = self.dfu.get_objects({'object_refs': [inref]})['data'][0]
-        except DFUError as e:
-            self.log('Logging stacktrace from workspace exception:\n' + e.data)
-            raise
+        diff_expr_obj = self.dfu.get_objects({'object_refs': [inref]})['data'][0]
 
         output_directory = os.path.join(self.scratch, str(uuid.uuid4()))
         try:
