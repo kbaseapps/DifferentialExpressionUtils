@@ -1,10 +1,13 @@
 import csv
 import errno
+import logging
 import os
 import re
+import string
 import uuid
 from collections import namedtuple
 from datetime import datetime
+
 from numpy import log2
 
 from installed_clients.DataFileUtilClient import DataFileUtil
@@ -12,6 +15,7 @@ from installed_clients.GenomeSearchUtilClient import GenomeSearchUtil
 from installed_clients.KBaseFeatureValuesClient import KBaseFeatureValues
 from installed_clients.SetAPIClient import SetAPI
 from installed_clients.WorkspaceClient import Workspace as Workspace
+
 
 class GenDiffExprMatrix:
 
@@ -59,13 +63,12 @@ class GenDiffExprMatrix:
                                            'limit': feature_num,
                                            'sort_by': [['feature_id', True]]})['features']
 
-        features_ids = map(lambda genome_feature: genome_feature.get('feature_id'),
-                           genome_features)
+        features_ids = [genome_feature.get('feature_id') for genome_feature in genome_features]
 
         return list(set(features_ids))
 
     def gen_matrix(self, infile, old_col_names, delimiter):
-        with open(infile, 'rb') as source:
+        with open(infile, 'r') as source:
             rdr = csv.DictReader(source, delimiter=delimiter)
             col_names = self.new_col_names[1:]
             row_names = []
@@ -77,9 +80,9 @@ class GenDiffExprMatrix:
                     values_list = []
                     for v in old_col_names[1:]:
                         tmpval = row[v]
-                        if isinstance(tmpval, (int, long, float)):
+                        if isinstance(tmpval, (int, float)):
                             values_list.append(float(tmpval))
-                        elif isinstance(tmpval, basestring):
+                        elif isinstance(tmpval, str):
                             if 'na' in tmpval.lower() or 'none' in tmpval.lower():
                                 values_list.append(None)
                             else:
@@ -109,13 +112,13 @@ class GenDiffExprMatrix:
                     if log2fc > maxvalue:
                         maxvalue = log2fc
 
-            print('maxvalue: ', maxvalue)
+            logging.info('maxvalue: ', maxvalue)
             return maxvalue
 
     def gen_cuffdiff_matrix(self, infile, delimiter='\t'):
 
         max_value = self.get_max_fold_change_to_handle_inf(infile)
-        with open(infile, 'rb') as source:
+        with open(infile, 'r') as source:
             rdr = csv.DictReader(source, delimiter=delimiter)
             col_names = self.new_col_names[1:]
 
@@ -124,7 +127,6 @@ class GenDiffExprMatrix:
             for row in rdr:
 
                 log2fc_val = row.get('log2_fold_change')
-                # print 'FC_VAL: ', log2fc_val
                 if '-inf' in str(log2fc_val):
                     row['log2_fold_change'] = -float(max_value)
                 elif 'inf' in str(log2fc_val):
@@ -198,7 +200,7 @@ class GenDiffExprMatrix:
                                       ballgown_col_names,
                                       delimiter='\t')
         log2_data_matrix = data_matrix
-        log2_data_matrix['values'] = map( self.safely_apply_log2_to_fc, data_matrix.get( 'values' ) )
+        log2_data_matrix['values'] = list(map( self.safely_apply_log2_to_fc, data_matrix.get( 'values' ) ))
 
         dem_ref = self.save_diff_expr_matrix(self.params.get('obj_name')+'_0',
                                              log2_data_matrix, None, None)
@@ -211,7 +213,6 @@ class GenDiffExprMatrix:
                     'items': set_items
                      }
         return self.save_diff_expr_matrix_set(self.params.get('obj_name'), matrix_set)
-
 
     def process_deseq_file(self, diffexpr_filepath):
 
@@ -249,7 +250,7 @@ class GenDiffExprMatrix:
         condPair_fileInfo = {}
 
         timestamp = str(int((datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds() * 1000))
-        with open(diffexpr_filepath, 'rb') as source:
+        with open(diffexpr_filepath, 'r') as source:
             rdr = csv.DictReader(source, dialect='excel-tab')
             """
             save the files opened for writing in outfiles list, so they can be closed later
@@ -266,7 +267,7 @@ class GenDiffExprMatrix:
                 if tsv_file_info is None:
                     tsv_file_name = timestamp + '_' + c1 + '~~' + c2
                     tsv_file_path = os.path.join(self.scratch, tsv_file_name)
-                    outfile = open(tsv_file_path, 'wb')
+                    outfile = open(tsv_file_path, 'w')
                     outfiles.append(outfile)
                     csv_wtr = csv.DictWriter(outfile, delimiter='\t', fieldnames=self.new_col_names)
                     csv_wtr.writerow(dict((cn, cn) for cn in self.new_col_names))
@@ -276,15 +277,13 @@ class GenDiffExprMatrix:
 
                 wtr = tsv_file_info.file_obj
                 col_vals = [r[v] for v in cuffdiff_col_names]
-                wtr.writerow(dict(zip(self.new_col_names, col_vals)))
+                wtr.writerow(dict(list(zip(self.new_col_names, col_vals))))
 
             for ofile in outfiles:
                 ofile.close()
 
             set_items = list()
-            for cond_pair, file_info in condPair_fileInfo.iteritems():
-                print('Cond_pair: ', cond_pair)
-                print('File: ', file_info.file_path)
+            for cond_pair, file_info in condPair_fileInfo.items():
                 tsv_file = file_info.file_path
 
                 data_matrix = self.gen_cuffdiff_matrix(tsv_file)
@@ -294,7 +293,7 @@ class GenDiffExprMatrix:
                                                      data_matrix,
                                                      cond_pair.condition1,
                                                      cond_pair.condition2)
-                print('process_cuffdiff_file: DEM_REF: ' + dem_ref)
+                logging.info('process_cuffdiff_file: DEM_REF: ' + dem_ref)
                 set_items.append({
                                     'label': cond_pair.condition1+', '+cond_pair.condition2,
                                     'ref': dem_ref
@@ -314,7 +313,7 @@ class GenDiffExprMatrix:
 
         feature_ids = self.get_feature_ids(genome_ref)
 
-        with open(infile, 'rb') as source:
+        with open(infile, 'r') as source:
             rdr = csv.DictReader(source, delimiter=delimiter)
             col_names = in_col_names[1:]
             row_names = []
@@ -343,9 +342,9 @@ class GenDiffExprMatrix:
                     values_list = []
                     for v in in_col_names[1:]:
                         tmpval = row[v]
-                        if isinstance(tmpval, (int, long, float)):
+                        if isinstance(tmpval, (int, float)):
                             values_list.append(float(tmpval))
-                        elif isinstance(tmpval, basestring):
+                        elif isinstance(tmpval, str):
                             if 'na' in tmpval.lower() or 'none' in tmpval.lower():
                                 values_list.append(None)
                             else:
@@ -366,14 +365,16 @@ class GenDiffExprMatrix:
     @staticmethod
     def get_obj_name(obj_name, condition1, condition2):
         def sanitize(ws_name):
-            # I'm not using translate because it's a mess with mixed unicode & strings
-            return ws_name.replace("\t", " ").replace(" ", "_").replace("/", "|")
+            """Translates some invalid characters when we can,  strips the rest"""
+            trans_dict = str.maketrans({"\t": "_", " ": "_", "/": "|"})
+            permited_char = set(string.ascii_letters + string.digits + "_-.|")
+            return "".join((x for x in ws_name.translate(trans_dict) if x in permited_char))
 
         return "{}-{}-VS-{}".format(obj_name, sanitize(condition2), sanitize(condition1))
 
     def gen_diffexpr_matrices(self, params):
 
-        print('In GEN DEMs')
+        logging.info('In GEN DEMs')
         self.params = params
         self.setup_data()
         diffexpr_filepath = self.params.get('diffexpr_filepath')
@@ -391,7 +392,7 @@ class GenDiffExprMatrix:
 
     def save_diffexpr_matrices(self, params):
 
-        print('In SAVE DEMs')
+        logging.info('In SAVE DEMs')
         self.params = params
         self.setup_data()
 
@@ -411,14 +412,14 @@ class GenDiffExprMatrix:
                 elif 'tsv' in fileext.lower():
                     delimiter = '\t'
                 else:
-                    print('Using tab delimiter')
+                    logging.info('Using tab delimiter')
 
             data_matrix = self.save_matrix(self.params.get('genome_ref'),
                                            diffexpr_filepath,
                                            self.new_col_names,
                                            delimiter)
 
-            condition1, condition2 = condition_mapping.items()[0]
+            condition1, condition2 = list(condition_mapping.items())[0]
             object_name = self.get_obj_name(self.params['obj_name'], condition1, condition2)
             dem_ref = self.save_diff_expr_matrix(object_name,
                                                  data_matrix,
